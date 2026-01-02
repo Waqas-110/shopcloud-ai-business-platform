@@ -1,0 +1,217 @@
+{% extends 'dashboard_base.html' %}
+{% load static %}
+
+{% block title %}اقسام - ShopCloud{% endblock %}
+
+{% block dashboard_css %}
+<link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
+<style>
+.dashboard-container {
+    display: flex;
+    min-height: calc(100vh - 70px);
+    background: #F4F6F8;
+    direction: rtl;
+}
+
+.main-content {
+    flex: 1;
+    margin-left: 280px !important;
+    margin-right: 0 !important;
+    width: calc(100% - 280px) !important;
+    padding: 30px;
+    direction: rtl;
+}
+
+.page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+    background: #FFFFFF;
+    padding: 25px;
+    border-radius: 15px;
+    box-shadow: 0 1px 6px rgba(15, 23, 42, 0.06);
+}
+
+.page-header h1 {
+    margin: 0;
+    font-size: 1.8rem;
+    color: #1f2937;
+    font-weight: 700;
+}
+
+.btn {
+    /* global buttons; size only */
+    padding: 10px 22px;
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+    color: white;
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(37, 99, 235, 0.4);
+}
+
+.btn-sm {
+    padding: 8px 16px;
+    font-size: 0.85rem;
+}
+
+.btn-outline-primary {
+    background: transparent;
+    border: 2px solid #2563eb;
+    color: #2563eb;
+}
+
+.btn-outline-primary:hover {
+    background: #2563eb;
+    color: white;
+}
+
+.btn-outline-danger {
+    background: transparent;
+    border: 2px solid #ef4444;
+    color: #ef4444;
+}
+
+.btn-outline-danger:hover {
+    background: #ef4444;
+    color: white;
+}
+
+.table-container {
+    background: #FFFFFF;
+    padding: 30px;
+    border-radius: 15px;
+    box-shadow: 0 1px 6px rgba(15, 23, 42, 0.06);
+}
+
+.categories-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.categories-table th {
+    background: #F9FAFB;
+    padding: 18px 15px;
+    text-align: right;
+    font-weight: 700;
+    color: #374151;
+    border-bottom: 1px solid #E0E3E7;
+    font-size: 0.9rem;
+}
+
+.categories-table td {
+    padding: 18px 15px;
+    border-bottom: 1px solid #F3F4F6;
+    color: #1f2937;
+    text-align: right;
+}
+
+.categories-table tr:hover {
+    background: #F9FAFB;
+}
+
+.category-name {
+    font-weight: 600;
+    color: #1f2937;
+}
+
+.category-description {
+    color: #6b7280;
+    font-size: 0.9rem;
+}
+
+.product-count {
+    padding: 6px 12px;
+    border-radius: 20px;
+    background: #4A6CF7;
+    color: #FFFFFF;
+    font-size: 0.85rem;
+    font-weight: 600;
+    display: inline-block;
+}
+
+.empty-state {
+    text-align: center;
+    padding: 60px 40px;
+    color: #6b7280;
+}
+
+.empty-state p {
+    font-size: 1.2rem;
+    margin-bottom: 10px;
+    font-weight: 600;
+}
+
+.empty-state small {
+    font-size: 0.95rem;
+}
+
+@media (max-width: 768px) {
+    .sidebar {
+        width: 100%;
+        height: auto;
+        position: relative;
+    }
+    
+    .main-content {
+        margin-left: 0 !important;
+        margin-right: 0 !important;
+        width: 100% !important;
+        padding: 20px 15px;
+    }
+}
+</style>
+{% endblock %}
+
+{% block dashboard_content %}
+
+        <div class="page-header">
+            <h1>اقسام کا انتظام</h1>
+            <a href="{% url 'products:add_category' %}" class="btn btn-primary">+ نئی قسم شامل کریں</a>
+        </div>
+
+        <div class="table-container">
+            <table class="categories-table">
+                <thead>
+                    <tr>
+                        <th>نام</th>
+                        <th>مصنوعات کی تعداد</th>
+                        <th>اعمال</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for category in categories %}
+                    <tr>
+                        <td>
+                            <span class="category-name">{{ category.name }}</span>
+                        </td>
+                        <td>
+                            <span class="product-count">{{ category.product_set.count }}</span>
+                        </td>
+                        <td>
+                            <a href="{% url 'products:edit_category' category.id %}" class="btn btn-sm btn-outline-primary">
+                                ترمیم
+                            </a>
+                            <a href="{% url 'products:delete_category' category.id %}" class="btn btn-sm btn-outline-danger" onclick="return confirm('کیا آپ واقعی اس قسم کو حذف کرنا چاہتے ہیں؟')">
+                                حذف
+                            </a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="3" class="empty-state">
+                            <p>🏷️ کوئی قسم نہیں ملی</p>
+                            <small>شروع کرنے کے لیے اپنی پہلی قسم شامل کریں!</small>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+{% endblock %}
+

@@ -1,0 +1,217 @@
+{% extends 'dashboard_base.html' %}
+
+{% block title %}Payment Options - ShopCloud{% endblock %}
+
+{% block dashboard_content %}
+<div class="container-fluid">
+    <div class="row">
+        <!-- Sidebar -->
+        <div class="col-md-2 sidebar">
+            <div class="sidebar-sticky">
+                <ul class="nav flex-column">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'dashboard:main' %}">
+                            <i class="fas fa-tachometer-alt"></i> Dashboard
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'products:list' %}">
+                            <i class="fas fa-box"></i> Products
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'billing:pos' %}">
+                            <i class="fas fa-cash-register"></i> POS
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'reports:dashboard' %}">
+                            <i class="fas fa-chart-bar"></i> Reports
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'ai_insights:dashboard' %}">
+                            <i class="fas fa-brain"></i> AI Insights
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="{% url 'settings:shop_settings' %}">
+                            <i class="fas fa-cog"></i> Settings
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Main content -->
+        <div class="col-md-10 main-content">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2><i class="fas fa-credit-card"></i> Payment Options</h2>
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a href="{% url 'dashboard:main' %}">Dashboard</a></li>
+                        <li class="breadcrumb-item"><a href="{% url 'settings:shop_settings' %}">Settings</a></li>
+                        <li class="breadcrumb-item active">Payment Options</li>
+                    </ol>
+                </nav>
+            </div>
+
+            <!-- Settings Navigation -->
+            <div class="row mb-4">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="btn-group" role="group">
+                                <a href="{% url 'settings:shop_settings' %}" class="btn btn-outline-primary">
+                                    <i class="fas fa-store"></i> Shop Settings
+                                </a>
+                                <a href="{% url 'settings:change_password' %}" class="btn btn-outline-primary">
+                                    <i class="fas fa-lock"></i> Change Password
+                                </a>
+                                <a href="{% url 'settings:preferences' %}" class="btn btn-outline-primary">
+                                    <i class="fas fa-sliders-h"></i> Preferences
+                                </a>
+                                <a href="{% url 'settings:payment_options' %}" class="btn btn-primary">
+                                    <i class="fas fa-credit-card"></i> Payment Options
+                                </a>
+                                <a href="{% url 'settings:data_backup' %}" class="btn btn-outline-primary">
+                                    <i class="fas fa-download"></i> Data Backup
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Payment Options Form -->
+            <div class="row">
+                <div class="col-md-8">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5><i class="fas fa-credit-card"></i> Configure Payment Methods</h5>
+                        </div>
+                        <div class="card-body">
+                            <form method="post">
+                                {% csrf_token %}
+                                
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <h6>Available Payment Methods</h6>
+                                        
+                                        <div class="form-check mb-3">
+                                            <input class="form-check-input" type="checkbox" name="cash_enabled" id="cash_enabled" 
+                                                   {% if payment_settings.cash_enabled %}checked{% endif %}>
+                                            <label class="form-check-label" for="cash_enabled">
+                                                <i class="fas fa-money-bill-wave text-success"></i> Cash Payment
+                                            </label>
+                                            <small class="form-text text-muted">Accept cash payments</small>
+                                        </div>
+
+                                        <div class="form-check mb-3">
+                                            <input class="form-check-input" type="checkbox" name="card_enabled" id="card_enabled"
+                                                   {% if payment_settings.card_enabled %}checked{% endif %}>
+                                            <label class="form-check-label" for="card_enabled">
+                                                <i class="fas fa-credit-card text-primary"></i> Card Payment
+                                            </label>
+                                            <small class="form-text text-muted">Accept debit/credit cards</small>
+                                        </div>
+
+                                        <div class="form-check mb-3">
+                                            <input class="form-check-input" type="checkbox" name="mobile_banking" id="mobile_banking"
+                                                   {% if payment_settings.mobile_banking %}checked{% endif %}>
+                                            <label class="form-check-label" for="mobile_banking">
+                                                <i class="fas fa-mobile-alt text-info"></i> Mobile Banking
+                                            </label>
+                                            <small class="form-text text-muted">JazzCash, EasyPaisa, etc.</small>
+                                        </div>
+
+                                        <div class="form-check mb-3">
+                                            <input class="form-check-input" type="checkbox" name="credit_enabled" id="credit_enabled"
+                                                   {% if payment_settings.credit_enabled %}checked{% endif %}>
+                                            <label class="form-check-label" for="credit_enabled">
+                                                <i class="fas fa-handshake text-warning"></i> Credit/Udhar
+                                            </label>
+                                            <small class="form-text text-muted">Allow customers to buy on credit</small>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <h6>Payment Settings</h6>
+                                        
+                                        <div class="mb-3">
+                                            <label for="default_payment" class="form-label">Default Payment Method</label>
+                                            <select class="form-select" name="default_payment" id="default_payment">
+                                                <option value="cash">Cash</option>
+                                                <option value="card">Card</option>
+                                                <option value="mobile">Mobile Banking</option>
+                                                <option value="credit">Credit</option>
+                                            </select>
+                                        </div>
+
+                                        <div class="mb-3">
+                                            <label for="card_fee" class="form-label">Card Processing Fee (%)</label>
+                                            <input type="number" class="form-control" name="card_fee" id="card_fee" 
+                                                   value="2.5" step="0.1" min="0" max="10">
+                                            <small class="form-text text-muted">Fee charged for card payments</small>
+                                        </div>
+
+                                        <div class="mb-3">
+                                            <label for="credit_limit" class="form-label">Credit Limit (₨)</label>
+                                            <input type="number" class="form-control" name="credit_limit" id="credit_limit" 
+                                                   value="5000" min="0">
+                                            <small class="form-text text-muted">Maximum credit amount per customer</small>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                                    <button type="submit" class="btn btn-primary">
+                                        <i class="fas fa-save"></i> Save Payment Settings
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <div class="card">
+                        <div class="card-header">
+                            <h6><i class="fas fa-info-circle"></i> Payment Tips</h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="alert alert-info">
+                                <h6><i class="fas fa-lightbulb"></i> Pro Tips:</h6>
+                                <ul class="mb-0">
+                                    <li>Enable multiple payment methods for customer convenience</li>
+                                    <li>Set appropriate card processing fees</li>
+                                    <li>Monitor credit payments regularly</li>
+                                    <li>Keep cash as default for faster transactions</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card mt-3">
+                        <div class="card-header">
+                            <h6><i class="fas fa-chart-pie"></i> Payment Statistics</h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="row text-center">
+                                <div class="col-6">
+                                    <h4 class="text-success">85%</h4>
+                                    <small>Cash</small>
+                                </div>
+                                <div class="col-6">
+                                    <h4 class="text-primary">15%</h4>
+                                    <small>Card</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

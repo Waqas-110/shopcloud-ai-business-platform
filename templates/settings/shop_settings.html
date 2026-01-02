@@ -1,0 +1,82 @@
+{% extends 'dashboard_base.html' %}
+
+{% block title %}Shop Settings{% endblock %}
+
+{% block dashboard_content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <h2><i class="fas fa-cog"></i> Shop Settings</h2>
+        </div>
+    </div>
+
+    <div class="row mt-4">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h5>Shop Information</h5>
+                </div>
+                <div class="card-body">
+                    <form method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group mb-3">
+                                    <label>Shop Name</label>
+                                    <input type="text" class="form-control" name="name" value="{{ shop.name }}" required>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group mb-3">
+                                    <label>Email</label>
+                                    <input type="email" class="form-control" name="email" value="{{ shop.email }}">
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group mb-3">
+                            <label>Address</label>
+                            <textarea class="form-control" name="address" rows="3">{{ shop.address }}</textarea>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group mb-3">
+                                    <label>WhatsApp Number</label>
+                                    <input type="text" class="form-control" name="whatsapp_number" value="{{ shop.whatsapp_number }}">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group mb-3">
+                                    <label>Shop Logo</label>
+                                    <input type="file" class="form-control" name="logo" accept="image/*">
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save"></i> Save Changes
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5>Current Logo</h5>
+                </div>
+                <div class="card-body text-center">
+                    {% if shop.logo %}
+                        <img src="{{ shop.logo.url }}" alt="Shop Logo" class="img-fluid" style="max-height: 200px;">
+                    {% else %}
+                        <i class="fas fa-store fa-5x text-muted"></i>
+                        <p class="text-muted mt-2">No logo uploaded</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

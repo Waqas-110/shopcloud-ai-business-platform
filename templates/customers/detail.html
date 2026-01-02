@@ -1,0 +1,466 @@
+{% extends 'dashboard_base.html' %}
+{% load static %}
+
+{% block dashboard_css %}
+<style>
+.customer-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 30px;
+    border-radius: 15px;
+    margin-bottom: 30px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+}
+
+.customer-info {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+    margin-top: 20px;
+}
+
+.info-card {
+    background: rgba(255,255,255,0.1);
+    padding: 20px;
+    border-radius: 10px;
+    backdrop-filter: blur(10px);
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+    margin-bottom: 30px;
+}
+
+.stat-card {
+    background: white;
+    padding: 25px;
+    border-radius: 15px;
+    text-align: center;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+    border-left: 5px solid #667eea;
+}
+
+.stat-value {
+    font-size: 2rem;
+    font-weight: bold;
+    color: #667eea;
+    margin-bottom: 5px;
+}
+
+.stat-label {
+    color: #666;
+    font-size: 0.9rem;
+}
+
+.bills-section {
+    background: white;
+    border-radius: 15px;
+    padding: 30px;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+}
+
+.bills-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+.bills-table th,
+.bills-table td {
+    padding: 15px;
+    text-align: left;
+    border-bottom: 1px solid #eee;
+}
+
+.bills-table th {
+    background: #f8f9fa;
+    font-weight: 600;
+    color: #333;
+}
+
+.bills-table tr:hover {
+    background: #f8f9fa;
+}
+
+.bill-number {
+    font-weight: bold;
+    color: #667eea;
+}
+
+.payment-badge {
+    padding: 5px 10px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: bold;
+}
+
+.payment-cash { background: #d4edda; color: #155724; }
+.payment-card { background: #cce5ff; color: #004085; }
+.payment-online { background: #fff3cd; color: #856404; }
+.payment-udhaar { background: #f8d7da; color: #721c24; }
+
+.no-bills {
+    text-align: center;
+    padding: 50px;
+    color: #666;
+}
+
+.back-btn {
+    background: #667eea;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 8px;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 20px;
+    transition: background 0.3s;
+}
+
+.back-btn:hover {
+    background: #5a6fd8;
+    color: white;
+    text-decoration: none;
+}
+
+/* Bills Slider Styles */
+.bills-slider {
+    position: relative;
+    overflow: hidden;
+}
+
+.bills-slider-container {
+    display: flex;
+    transition: transform 0.5s ease;
+    gap: 20px;
+}
+
+.bill-slide {
+    min-width: 300px;
+    flex-shrink: 0;
+    background: #f8f9fa;
+    border-radius: 10px;
+    padding: 20px;
+    border-left: 4px solid #667eea;
+}
+
+.bill-slide-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.bill-slide-number {
+    font-weight: bold;
+    color: #667eea;
+    font-size: 1.1rem;
+}
+
+.bill-slide-date {
+    color: #666;
+    font-size: 0.9rem;
+}
+
+.bill-slide-amount {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #333;
+    margin: 10px 0;
+}
+
+.bill-slide-payment {
+    margin-bottom: 15px;
+}
+
+.bills-slider-controls {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 20px;
+    margin-top: 20px;
+}
+
+.bills-slider-btn {
+    background: #667eea;
+    color: white;
+    border: none;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s;
+}
+
+.bills-slider-btn:hover {
+    background: #5a6fd8;
+    transform: scale(1.1);
+}
+
+.bills-slider-btn:disabled {
+    background: #ccc;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.bills-slider-info {
+    text-align: center;
+    color: #666;
+    font-size: 0.9rem;
+    margin-bottom: 15px;
+}
+
+.view-mode-toggle {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.toggle-btn {
+    padding: 8px 15px;
+    border: 2px solid #667eea;
+    background: white;
+    color: #667eea;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.toggle-btn.active {
+    background: #667eea;
+    color: white;
+}
+
+.toggle-btn:hover {
+    background: #667eea;
+    color: white;
+}
+</style>
+{% endblock %}
+
+{% block dashboard_content %}
+<a href="{% url 'customers:list' %}" class="back-btn">
+    <i class="fas fa-arrow-left"></i> Back to Customers
+</a>
+
+<div class="customer-header">
+    <h1><i class="fas fa-user"></i> {{ customer.name }}</h1>
+    <div class="customer-info">
+        <div class="info-card">
+            <h4><i class="fas fa-phone"></i> Phone</h4>
+            <p>{{ customer.phone|default:"Not provided" }}</p>
+        </div>
+        <div class="info-card">
+            <h4><i class="fas fa-envelope"></i> Email</h4>
+            <p>{{ customer.email|default:"Not provided" }}</p>
+        </div>
+        <div class="info-card">
+            <h4><i class="fas fa-map-marker-alt"></i> Address</h4>
+            <p>{{ customer.address|default:"Not provided" }}</p>
+        </div>
+        <div class="info-card">
+            <h4><i class="fas fa-calendar"></i> Customer Since</h4>
+            <p>{{ customer.created_at|date:"M d, Y" }}</p>
+        </div>
+    </div>
+</div>
+
+<div class="stats-grid">
+    <div class="stat-card">
+        <div class="stat-value">{{ stats.total_bills }}</div>
+        <div class="stat-label">Total Bills</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-value">Rs. {{ stats.total_spent|floatformat:0 }}</div>
+        <div class="stat-label">Total Spent</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-value">Rs. {{ stats.avg_bill|floatformat:0 }}</div>
+        <div class="stat-label">Average Bill</div>
+    </div>
+</div>
+
+<div class="bills-section">
+    <h2><i class="fas fa-receipt"></i> Purchase History</h2>
+    
+    {% if bills %}
+        <!-- View Mode Toggle -->
+        <div class="view-mode-toggle">
+            <button class="toggle-btn active" id="sliderViewBtn">
+                <i class="fas fa-th-large"></i> Slider View
+            </button>
+            <button class="toggle-btn" id="tableViewBtn">
+                <i class="fas fa-table"></i> Table View
+            </button>
+        </div>
+        
+        <!-- Slider View -->
+        <div class="bills-slider" id="billsSlider">
+            <div class="bills-slider-info">
+                Showing <span id="currentBillSlide">1</span> of <span id="totalBillSlides">{{ bills|length }}</span> bills
+            </div>
+            
+            <div class="bills-slider-container" id="billsSliderContainer">
+                {% for bill in bills %}
+                <div class="bill-slide">
+                    <div class="bill-slide-header">
+                        <div class="bill-slide-number">#{{ bill.bill_number }}</div>
+                        <div class="bill-slide-date">{{ bill.date|date:"M d, Y" }}</div>
+                    </div>
+                    
+                    <div class="bill-slide-amount">
+                        Rs. {{ bill.total|floatformat:0 }}
+                    </div>
+                    
+                    <div class="bill-slide-payment">
+                        <span class="payment-badge payment-{{ bill.payment_type }}">
+                            {{ bill.get_payment_type_display }}
+                        </span>
+                    </div>
+                    
+                    <a href="{% url 'billing:bill_detail' bill.id %}" class="view-btn">
+                        <i class="fas fa-eye"></i> View Details
+                    </a>
+                </div>
+                {% endfor %}
+            </div>
+            
+            <div class="bills-slider-controls">
+                <button class="bills-slider-btn" id="billsPrevBtn">
+                    <i class="fas fa-chevron-left"></i>
+                </button>
+                
+                <span id="billsSliderPosition">1 / {{ bills|length }}</span>
+                
+                <button class="bills-slider-btn" id="billsNextBtn">
+                    <i class="fas fa-chevron-right"></i>
+                </button>
+            </div>
+        </div>
+        
+        <!-- Table View (Hidden by default) -->
+        <div id="billsTable" style="display: none;">
+            <table class="bills-table">
+                <thead>
+                    <tr>
+                        <th>Bill Number</th>
+                        <th>Date</th>
+                        <th>Total Amount</th>
+                        <th>Payment Type</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for bill in bills %}
+                    <tr>
+                        <td class="bill-number">#{{ bill.bill_number }}</td>
+                        <td>{{ bill.date|date:"M d, Y H:i" }}</td>
+                        <td>Rs. {{ bill.total|floatformat:0 }}</td>
+                        <td>
+                            <span class="payment-badge payment-{{ bill.payment_type }}">
+                                {{ bill.get_payment_type_display }}
+                            </span>
+                        </td>
+                        <td>
+                            <a href="{% url 'billing:bill_detail' bill.id %}" class="btn btn-sm btn-primary">
+                                <i class="fas fa-eye"></i> View
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <div class="no-bills">
+            <i class="fas fa-receipt" style="font-size: 3rem; color: #ccc; margin-bottom: 20px;"></i>
+            <h3>No Bills Found</h3>
+            <p>This customer hasn't made any purchases yet.</p>
+        </div>
+    {% endif %}
+</div>
+
+<script>
+// Bills slider functionality
+let currentBillSlide = 0;
+const billsSliderContainer = document.getElementById('billsSliderContainer');
+const billSlides = document.querySelectorAll('.bill-slide');
+const totalBillSlides = billSlides.length;
+const billsPrevBtn = document.getElementById('billsPrevBtn');
+const billsNextBtn = document.getElementById('billsNextBtn');
+const currentBillSlideSpan = document.getElementById('currentBillSlide');
+const billsSliderPosition = document.getElementById('billsSliderPosition');
+
+function updateBillsSlider() {
+    if (billSlides.length > 0) {
+        const slideWidth = billSlides[0].offsetWidth + 20;
+        billsSliderContainer.style.transform = `translateX(-${currentBillSlide * slideWidth}px)`;
+        
+        currentBillSlideSpan.textContent = currentBillSlide + 1;
+        billsSliderPosition.textContent = `${currentBillSlide + 1} / ${totalBillSlides}`;
+        
+        billsPrevBtn.disabled = currentBillSlide === 0;
+        billsNextBtn.disabled = currentBillSlide === totalBillSlides - 1;
+    }
+}
+
+function nextBillSlide() {
+    if (currentBillSlide < totalBillSlides - 1) {
+        currentBillSlide++;
+        updateBillsSlider();
+    }
+}
+
+function prevBillSlide() {
+    if (currentBillSlide > 0) {
+        currentBillSlide--;
+        updateBillsSlider();
+    }
+}
+
+if (billsNextBtn && billsPrevBtn) {
+    billsNextBtn.addEventListener('click', nextBillSlide);
+    billsPrevBtn.addEventListener('click', prevBillSlide);
+    
+    // Keyboard navigation for bills
+    document.addEventListener('keydown', function(e) {
+        if (e.ctrlKey && e.key === 'ArrowLeft') prevBillSlide();
+        if (e.ctrlKey && e.key === 'ArrowRight') nextBillSlide();
+    });
+    
+    updateBillsSlider();
+}
+
+// View mode toggle
+const sliderViewBtn = document.getElementById('sliderViewBtn');
+const tableViewBtn = document.getElementById('tableViewBtn');
+const billsSlider = document.getElementById('billsSlider');
+const billsTable = document.getElementById('billsTable');
+
+if (sliderViewBtn && tableViewBtn) {
+    sliderViewBtn.addEventListener('click', function() {
+        billsSlider.style.display = 'block';
+        billsTable.style.display = 'none';
+        sliderViewBtn.classList.add('active');
+        tableViewBtn.classList.remove('active');
+        updateBillsSlider();
+    });
+    
+    tableViewBtn.addEventListener('click', function() {
+        billsSlider.style.display = 'none';
+        billsTable.style.display = 'block';
+        tableViewBtn.classList.add('active');
+        sliderViewBtn.classList.remove('active');
+    });
+}
+
+window.addEventListener('resize', updateBillsSlider);
+</script>
+{% endblock %}

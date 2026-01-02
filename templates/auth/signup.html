@@ -1,0 +1,322 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Sign Up - ShopCloud{% endblock %}
+
+{% block extra_css %}
+<style>
+.signup-hero {
+    background: linear-gradient(135deg, #F4F6F8 0%, #E6ECFF 100%);
+    color: #1A202C;
+    padding: 60px 20px;
+    text-align: center;
+}
+
+.signup-hero h1 {
+    font-size: 2.3rem;
+    font-weight: 800;
+    margin-bottom: 10px;
+}
+
+.signup-hero p {
+    font-size: 1.05rem;
+    opacity: 0.85;
+}
+
+.signup-container {
+    max-width: 900px;
+    margin: -40px auto 60px;
+    padding: 0 20px;
+    position: relative;
+    z-index: 10;
+}
+
+.signup-card {
+    background: white;
+    border-radius: 20px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+}
+
+.signup-left {
+    background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+    color: white;
+    padding: 50px 40px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    text-align: center;
+}
+
+.signup-left img {
+    width: 120px;
+    height: 120px;
+    margin: 0 auto 30px;
+    opacity: 0.9;
+}
+
+.signup-left h2 {
+    font-size: 2rem;
+    margin-bottom: 20px;
+    font-weight: 700;
+}
+
+.signup-left p {
+    font-size: 1.1rem;
+    opacity: 0.95;
+    line-height: 1.8;
+    margin-bottom: 30px;
+}
+
+.signup-left ul {
+    list-style: none;
+    padding: 0;
+    margin: 30px 0;
+    text-align: left;
+}
+
+.signup-left li {
+    padding: 10px 0;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 1rem;
+}
+
+.signup-left li .icon {
+    font-size: 1.3rem;
+    width: 25px;
+}
+
+.signup-right {
+    padding: 50px 40px;
+}
+
+.signup-right h3 {
+    font-size: 1.8rem;
+    margin-bottom: 10px;
+    color: #1f2937;
+    font-weight: 700;
+}
+
+.signup-right p {
+    color: #6b7280;
+    margin-bottom: 30px;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-label {
+    display: block;
+    font-weight: 600;
+    color: #374151;
+    margin-bottom: 8px;
+    font-size: 0.95rem;
+}
+
+.form-control {
+    width: 100%;
+    padding: 12px 16px;
+    border: 1px solid #E0E3E7;
+    border-radius: 10px;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    background: #f9fafb;
+}
+
+.form-control:focus {
+    outline: none;
+    border-color: #4A6CF7;
+    background: #FFFFFF;
+    box-shadow: 0 0 0 0.12rem rgba(74, 108, 247, 0.25);
+}
+
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+}
+
+.btn-submit {
+    width: 100%;
+    padding: 12px;
+    background: #4A6CF7;
+    color: #FFFFFF;
+    border: none;
+    border-radius: 10px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-top: 10px;
+}
+
+.btn-submit:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 18px rgba(74, 108, 247, 0.35);
+}
+
+.login-link {
+    text-align: center;
+    margin-top: 25px;
+    padding-top: 25px;
+    border-top: 1px solid #e5e7eb;
+}
+
+.login-link a {
+    color: #2563eb;
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.login-link a:hover {
+    text-decoration: underline;
+}
+
+.alert {
+    padding: 12px 16px;
+    border-radius: 10px;
+    margin-bottom: 20px;
+    font-size: 0.95rem;
+}
+
+.alert-success {
+    background: #d1fae5;
+    color: #065f46;
+    border: 1px solid #a7f3d0;
+}
+
+.alert-error {
+    background: #fee2e2;
+    color: #991b1b;
+    border: 1px solid #fecaca;
+}
+
+.password-hint {
+    font-size: 0.85rem;
+    color: #6b7280;
+    margin-top: 5px;
+}
+
+@media (max-width: 768px) {
+    .signup-card {
+        grid-template-columns: 1fr;
+    }
+    
+    .signup-left {
+        padding: 40px 30px;
+    }
+    
+    .signup-right {
+        padding: 40px 30px;
+    }
+    
+    .form-row {
+        grid-template-columns: 1fr;
+    }
+    
+    .signup-hero h1 {
+        font-size: 2rem;
+    }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<section class="signup-hero">
+    <div class="container">
+        <h1>Join ShopCloud Today</h1>
+        <p>Start managing your shop digitally in just 2 minutes</p>
+    </div>
+</section>
+
+<div class="signup-container">
+    <div class="signup-card">
+        <div class="signup-left">
+            <img src="{% static 'images/logo-icon.svg' %}" alt="ShopCloud">
+            <h2>ShopCloud</h2>
+            <p>Your complete POS solution for managing your shop efficiently</p>
+            <ul class="features-list">
+                <li>
+                    <span class="icon">✅</span>
+                    <span>100% Free Forever</span>
+                </li>
+                <li>
+                    <span class="icon">✅</span>
+                    <span>Easy to Use</span>
+                </li>
+                <li>
+                    <span class="icon">✅</span>
+                    <span>Mobile Friendly</span>
+                </li>
+                <li>
+                    <span class="icon">✅</span>
+                    <span>AI-Powered Insights</span>
+                </li>
+                <li>
+                    <span class="icon">✅</span>
+                    <span>24/7 Support</span>
+                </li>
+            </ul>
+                </div>
+        
+        <div class="signup-right">
+            <h3>Create Your Account</h3>
+            <p>Fill in your details to get started</p>
+            
+                    {% if messages %}
+                        {% for message in messages %}
+                            <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+                        {% endfor %}
+                    {% endif %}
+                    
+                    <form method="post">
+                        {% csrf_token %}
+                
+                <div class="form-row">
+                    <div class="form-group">
+                                <label for="first_name" class="form-label">First Name</label>
+                        <input type="text" class="form-control" id="first_name" name="first_name" required placeholder="Enter your first name">
+                            </div>
+                    <div class="form-group">
+                                <label for="last_name" class="form-label">Last Name</label>
+                        <input type="text" class="form-control" id="last_name" name="last_name" required placeholder="Enter your last name">
+                            </div>
+                        </div>
+                
+                <div class="form-group">
+                            <label for="username" class="form-label">Username</label>
+                    <input type="text" class="form-control" id="username" name="username" required placeholder="Choose a username">
+                    <div class="password-hint">Must be at least 3 characters</div>
+                        </div>
+                
+                <div class="form-group">
+                    <label for="email" class="form-label">Email Address</label>
+                    <input type="email" class="form-control" id="email" name="email" required placeholder="your.email@example.com">
+                        </div>
+                
+                <div class="form-group">
+                            <label for="password" class="form-label">Password</label>
+                    <input type="password" class="form-control" id="password" name="password" required placeholder="Create a strong password">
+                    <div class="password-hint">Must be at least 6 characters</div>
+                        </div>
+                
+                <div class="form-group">
+                            <label for="confirm_password" class="form-label">Confirm Password</label>
+                    <input type="password" class="form-control" id="confirm_password" name="confirm_password" required placeholder="Re-enter your password">
+                        </div>
+                
+                <button type="submit" class="btn-submit">Create Free Account</button>
+                    </form>
+                    
+            <div class="login-link">
+                        <p>Already have an account? <a href="{% url 'users:login' %}">Login here</a></p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

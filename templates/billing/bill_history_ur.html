@@ -1,0 +1,150 @@
+{% extends 'dashboard_base.html' %}
+{% load static %}
+
+{% block title %}بل کی تاریخ - شاپ کلاؤڈ{% endblock %}
+
+{% block dashboard_css %}
+<link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
+<style>
+body {
+    font-family: 'Noto Nastaliq Urdu', Arial, sans-serif;
+    direction: rtl;
+}
+
+.page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+    background: #FFFFFF;
+    padding: 25px;
+    border-radius: 15px;
+    box-shadow: 0 1px 6px rgba(15, 23, 42, 0.06);
+    direction: rtl;
+}
+
+.page-header h1 {
+    margin: 0;
+    font-size: 1.8rem;
+    color: #1f2937;
+    font-weight: 700;
+}
+
+.search-container {
+    background: #FFFFFF;
+    padding: 20px;
+    border-radius: 15px;
+    box-shadow: 0 1px 6px rgba(15, 23, 42, 0.06);
+    margin-bottom: 20px;
+    direction: rtl;
+}
+
+.table-container {
+    background: #FFFFFF;
+    padding: 30px;
+    border-radius: 15px;
+    box-shadow: 0 1px 6px rgba(15, 23, 42, 0.06);
+    direction: rtl;
+}
+
+.bills-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.bills-table th {
+    background: #F9FAFB;
+    padding: 18px 15px;
+    text-align: right;
+    font-weight: 700;
+    color: #374151;
+    border-bottom: 1px solid #E0E3E7;
+    font-size: 0.9rem;
+}
+
+.bills-table td {
+    padding: 18px 15px;
+    border-bottom: 1px solid #F3F4F6;
+    color: #1f2937;
+    text-align: right;
+}
+
+.bills-table tr:hover {
+    background: #F9FAFB;
+}
+
+.form-control {
+    text-align: right;
+}
+
+.btn {
+    font-family: 'Noto Nastaliq Urdu', Arial, sans-serif;
+}
+
+.empty-state {
+    text-align: center;
+    padding: 60px 40px;
+    color: #6b7280;
+}
+</style>
+{% endblock %}
+
+{% block dashboard_content %}
+<div class="page-header">
+    <h1>بل کی تاریخ</h1>
+    <a href="{% url 'billing:pos' %}" class="btn btn-primary">
+        + نیا بل
+    </a>
+</div>
+
+<div class="search-container">
+    <form method="get" class="d-flex">
+        <input type="text" class="form-control me-2" name="search" placeholder="بل نمبر، کسٹمر کا نام یا فون نمبر تلاش کریں..." value="{{ search }}">
+        <button type="submit" class="btn btn-outline-primary">تلاش</button>
+    </form>
+</div>
+
+<div class="table-container">
+    <table class="bills-table">
+        <thead>
+            <tr>
+                <th>بل نمبر</th>
+                <th>کسٹمر</th>
+                <th>تاریخ</th>
+                <th>ادائیگی کا طریقہ</th>
+                <th>کل رقم</th>
+                <th>عمل</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for bill in bills %}
+            <tr>
+                <td><strong>{{ bill.bill_number }}</strong></td>
+                <td>{{ bill.customer_name|default:"واک ان" }}</td>
+                <td>{{ bill.date|date:"M d, Y H:i" }}</td>
+                <td>
+                    {% if bill.payment_type == 'cash' %}نقد
+                    {% elif bill.payment_type == 'card' %}کارڈ
+                    {% elif bill.payment_type == 'udhaar' %}ادھار
+                    {% else %}{{ bill.get_payment_type_display }}
+                    {% endif %}
+                </td>
+                <td><strong>Rs. {{ bill.total }}</strong></td>
+                <td>
+                    <a href="{% url 'billing:bill_detail' bill.id %}" class="btn btn-sm btn-outline-primary">
+                        دیکھیں
+                    </a>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="6" class="empty-state">
+                    <p>🧾 کوئی بل نہیں ملا</p>
+                    <small>اپنا پہلا بل بنانے کے لیے POS استعمال کریں!</small>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

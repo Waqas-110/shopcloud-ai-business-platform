@@ -1,0 +1,177 @@
+{% extends 'dashboard_base.html' %}
+{% load static %}
+
+{% block title %}Sales Predictions - {{ shop.name }}{% endblock %}
+
+{% block dashboard_content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2><i class="fas fa-chart-line text-primary"></i> Sales Predictions</h2>
+                <a href="{% url 'ai_insights:dashboard' %}" class="btn btn-outline-secondary">
+                    <i class="fas fa-arrow-left"></i> Back to Dashboard
+                </a>
+            </div>
+        </div>
+    </div>
+
+    {% if predictions %}
+    <div class="row">
+        <!-- Chart Section -->
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-header">
+                    <h5><i class="fas fa-chart-area"></i> 7-Day Sales Forecast</h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="salesChart" height="100"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Predictions List -->
+        <div class="col-lg-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5><i class="fas fa-list"></i> Daily Predictions</h5>
+                </div>
+                <div class="card-body">
+                    {% for prediction in predictions %}
+                    <div class="d-flex justify-content-between align-items-center mb-3 p-2 border rounded">
+                        <div>
+                            <strong>{{ prediction.date|date:"l, M d" }}</strong>
+                            <div class="progress mt-1" style="height: 5px;">
+                                <div class="progress-bar bg-success" style="width: {{ prediction.confidence|floatformat:0 }}%"></div>
+                            </div>
+                            <small class="text-muted">{{ prediction.confidence|floatformat:0 }}% confidence</small>
+                        </div>
+                        <div class="text-right">
+                            <h5 class="text-success mb-0">₨{{ prediction.predicted_sales|floatformat:0 }}</h5>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <!-- Summary Stats -->
+            <div class="card mt-3">
+                <div class="card-header">
+                    <h6><i class="fas fa-calculator"></i> Week Summary</h6>
+                </div>
+                <div class="card-body">
+                    {% with total_predicted=predictions|length %}
+                    <div class="row text-center">
+                        <div class="col-6">
+                            <h4 class="text-primary">{{ total_predicted }}</h4>
+                            <small class="text-muted">Days</small>
+                        </div>
+                        <div class="col-6">
+                            <h4 class="text-success">₨{% widthratio predictions.0.predicted_sales 1 7 %}</h4>
+                            <small class="text-muted">Est. Week Total</small>
+                        </div>
+                    </div>
+                    {% endwith %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Insights & Tips -->
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5><i class="fas fa-lightbulb"></i> AI Insights</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="alert alert-info">
+                                <h6><i class="fas fa-calendar-week"></i> Best Day</h6>
+                                <p class="mb-0">Weekend sales typically increase by 30%. Plan inventory accordingly.</p>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="alert alert-success">
+                                <h6><i class="fas fa-trending-up"></i> Growth Trend</h6>
+                                <p class="mb-0">Your sales show consistent growth. Consider expanding popular categories.</p>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="alert alert-warning">
+                                <h6><i class="fas fa-exclamation-triangle"></i> Recommendation</h6>
+                                <p class="mb-0">Stock up on fast-moving items before predicted high-sales days.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {% else %}
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body text-center py-5">
+                    <i class="fas fa-chart-line fa-4x text-muted mb-4"></i>
+                    <h4>No Predictions Available</h4>
+                    <p class="text-muted">AI needs more sales data to generate accurate predictions. Keep selling and check back soon!</p>
+                    <a href="{% url 'billing:pos' %}" class="btn btn-primary">
+                        <i class="fas fa-cash-register"></i> Make a Sale
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+{% if predictions %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+const ctx = document.getElementById('salesChart').getContext('2d');
+const salesChart = new Chart(ctx, {
+    type: 'line',
+    data: {
+        labels: [
+            {% for prediction in predictions %}
+            '{{ prediction.date|date:"M d" }}'{% if not forloop.last %},{% endif %}
+            {% endfor %}
+        ],
+        datasets: [{
+            label: 'Predicted Sales (₨)',
+            data: [
+                {% for prediction in predictions %}
+                {{ prediction.predicted_sales }}{% if not forloop.last %},{% endif %}
+                {% endfor %}
+            ],
+            borderColor: 'rgb(75, 192, 192)',
+            backgroundColor: 'rgba(75, 192, 192, 0.1)',
+            tension: 0.4,
+            fill: true
+        }]
+    },
+    options: {
+        responsive: true,
+        plugins: {
+            legend: {
+                display: false
+            }
+        },
+        scales: {
+            y: {
+                beginAtZero: true,
+                ticks: {
+                    callback: function(value) {
+                        return '₨' + value.toLocaleString();
+                    }
+                }
+            }
+        }
+    }
+});
+</script>
+{% endif %}
+{% endblock %}

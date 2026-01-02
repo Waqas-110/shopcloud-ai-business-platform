@@ -1,0 +1,355 @@
+{% extends 'dashboard_base.html' %}
+{% load static %}
+
+{% block title %}Add Product - ShopCloud{% endblock %}
+
+{% block dashboard_css %}
+<link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
+<style>
+.page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+    background: #FFFFFF;
+    padding: 25px;
+    border-radius: 15px;
+    box-shadow: 0 1px 6px rgba(15, 23, 42, 0.06);
+}
+
+.page-header h1 {
+    margin: 0;
+    font-size: 1.8rem;
+    color: #1f2937;
+    font-weight: 700;
+}
+
+.form-container {
+    max-width: 900px;
+    background: #FFFFFF;
+    padding: 30px;
+    border-radius: 15px;
+    box-shadow: 0 1px 6px rgba(15, 23, 42, 0.06);
+}
+
+.form-label {
+    font-weight: 600;
+    color: #1A202C;
+    margin-bottom: 8px;
+    display: block;
+}
+
+.form-control {
+    width: 100%;
+    padding: 12px 16px;
+    border: 1px solid #E0E3E7;
+    border-radius: 10px;
+    font-size: 1rem;
+    transition: all 0.3s;
+}
+
+.form-control:focus {
+    outline: none;
+    border-color: #4A6CF7;
+    box-shadow: 0 0 0 0.15rem rgba(74, 108, 247, 0.25);
+}
+
+.form-actions {
+    display: flex;
+    gap: 15px;
+    margin-top: 30px;
+    padding-top: 25px;
+    border-top: 2px solid #e5e7eb;
+}
+
+.btn {
+    /* use global buttons; adjust size only */
+    padding: 10px 24px;
+}
+
+.input-group {
+    display: flex;
+    gap: 0;
+}
+
+.input-group .form-control {
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+}
+
+.input-group .btn {
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+    padding: 12px 20px;
+}
+
+.alert {
+    padding: 15px 20px;
+    border-radius: 10px;
+    margin-bottom: 20px;
+}
+
+.row {
+    display: flex;
+    gap: 20px;
+    margin-bottom: 20px;
+}
+
+.col-md-6 {
+    flex: 1;
+}
+
+.col-md-4 {
+    flex: 0 0 calc(33.333% - 14px);
+}
+
+@media (max-width: 768px) {
+    .row {
+        flex-direction: column;
+    }
+    
+    .col-md-4,
+    .col-md-6 {
+        flex: 1;
+    }
+}
+</style>
+{% endblock %}
+
+{% block dashboard_content %}
+
+        <div class="page-header">
+            <h1>Add New Product</h1>
+            <a href="{% url 'products:list' %}" class="btn btn-secondary">← Back to Products</a>
+        </div>
+
+        <div class="form-container">
+            <div class="card">
+                <div class="card-body">
+                    {% if messages %}
+                        {% for message in messages %}
+                            <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+                        {% endfor %}
+                    {% endif %}
+
+                    <form method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="name" class="form-label">Product Name *</label>
+                                <input type="text" class="form-control" id="name" name="name" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="category" class="form-label">Category</label>
+                                <select class="form-control" id="category" name="category">
+                                    <option value="">Select Category</option>
+                                    {% for category in categories %}
+                                        <option value="{{ category.id }}">{{ category.name }}</option>
+                                    {% endfor %}
+                                </select>
+                                <small class="text-muted"><a href="{% url 'products:add_category' %}" target="_blank">Add New Category</a></small>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
+                                <label for="unit" class="form-label">Unit *</label>
+                                <select class="form-control" id="unit" name="unit" required>
+                                    <option value="piece">Piece</option>
+                                    <option value="kg">Kilogram</option>
+                                    <option value="liter">Liter</option>
+                                    <option value="meter">Meter</option>
+                                    <option value="box">Box</option>
+                                    <option value="dozen">Dozen</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label for="cost_price" class="form-label">Cost Price (Rs.) *</label>
+                                <input type="number" step="0.01" class="form-control" id="cost_price" name="cost_price" required>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label for="sale_price" class="form-label">Sale Price (Rs.) *</label>
+                                <input type="number" step="0.01" class="form-control" id="sale_price" name="sale_price" required>
+                                <small id="profit-display" class="text-muted"></small>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
+                                <label for="stock" class="form-label">Stock Quantity *</label>
+                                <input type="number" class="form-control" id="stock" name="stock" required>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label for="min_stock_alert" class="form-label">Min Stock Alert</label>
+                                <input type="number" class="form-control" id="min_stock_alert" name="min_stock_alert" value="5">
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label for="barcode" class="form-label">Barcode</label>
+                                <input type="text" class="form-control" id="barcode" name="barcode" placeholder="Enter barcode or use buttons below">
+                                <div class="mt-2">
+                                    <button type="button" class="btn btn-primary btn-sm me-2" onclick="startBarcodeScanner()">Scan</button>
+                                    <button type="button" class="btn btn-secondary btn-sm" onclick="generateRandomBarcode()">Generate</button>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="image" class="form-label">Product Image</label>
+                                <input type="file" class="form-control" id="image" name="image" accept="image/*">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="description" class="form-label">Description</label>
+                                <textarea class="form-control" id="description" name="description" rows="3"></textarea>
+                            </div>
+                        </div>
+
+                        <div class="form-actions">
+                            <button type="submit" class="btn btn-success">Add Product</button>
+                            <a href="{% url 'products:list' %}" class="btn btn-secondary">Cancel</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+
+<style>
+.form-container {
+    max-width: 800px;
+}
+
+.form-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.row {
+    display: flex;
+    gap: 20px;
+}
+
+.col-md-6 {
+    flex: 1;
+}
+
+.col-md-4 {
+    flex: 0 0 33.333%;
+}
+
+.text-muted {
+    color: #6c757d;
+    font-size: 0.875rem;
+}
+
+.text-muted a {
+    color: #007bff;
+    text-decoration: none;
+}
+
+.text-muted a:hover {
+    text-decoration: underline;
+}
+
+.input-group {
+    display: flex;
+}
+
+.input-group .form-control {
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+}
+
+.input-group .btn {
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+}
+</style>
+
+<script>
+function generateRandomBarcode() {
+    const barcode = Math.random().toString(36).substr(2, 12).toUpperCase();
+    document.getElementById('barcode').value = barcode;
+}
+
+function startBarcodeScanner() {
+    // First try to detect attached barcode scanner
+    document.addEventListener('keydown', handleScannerInput);
+    
+    // Check for USB HID devices (barcode scanners)
+    if (navigator.hid) {
+        navigator.hid.getDevices().then(devices => {
+            const scanner = devices.find(device => 
+                device.productName && 
+                (device.productName.toLowerCase().includes('scanner') || 
+                 device.productName.toLowerCase().includes('barcode'))
+            );
+            
+            if (scanner) {
+                alert('Barcode scanner found! Please scan barcode now.');
+                return;
+            }
+            
+            // No scanner found - stop here
+            alert('No barcode scanner found.');
+        }).catch(() => {
+            // HID not supported - stop here
+            alert('Barcode scanner not supported.');
+        });
+    } else {
+        // HID not supported - stop here
+        alert('Barcode scanner not supported.');
+    }
+}
+
+let scannerBuffer = '';
+let scannerTimeout;
+
+function handleScannerInput(event) {
+    // Barcode scanners typically send data quickly and end with Enter
+    if (event.key === 'Enter' && scannerBuffer.length > 5) {
+        event.preventDefault();
+        const barcode = scannerBuffer.trim();
+        scannerBuffer = '';
+        document.removeEventListener('keydown', handleScannerInput);
+        
+        if (barcode) {
+            document.getElementById('barcode').value = barcode;
+            alert('Barcode scanned: ' + barcode);
+        }
+        return;
+    }
+    
+    // Collect characters for barcode
+    if (event.key.length === 1) {
+        scannerBuffer += event.key;
+        
+        // Clear buffer after 100ms of inactivity (scanner sends data fast)
+        clearTimeout(scannerTimeout);
+        scannerTimeout = setTimeout(() => {
+            scannerBuffer = '';
+        }, 100);
+    }
+}
+
+// Auto-calculate profit margin
+document.getElementById('cost_price').addEventListener('input', calculateProfit);
+document.getElementById('sale_price').addEventListener('input', calculateProfit);
+
+function calculateProfit() {
+    const costPrice = parseFloat(document.getElementById('cost_price').value) || 0;
+    const salePrice = parseFloat(document.getElementById('sale_price').value) || 0;
+    
+    if (costPrice > 0) {
+        const profit = ((salePrice - costPrice) / costPrice * 100).toFixed(1);
+        const profitDisplay = document.getElementById('profit-display');
+        if (profitDisplay) {
+            profitDisplay.textContent = `Profit: ${profit}%`;
+            profitDisplay.style.color = profit > 0 ? 'green' : 'red';
+        }
+    }
+}
+</script>
+{% endblock %}

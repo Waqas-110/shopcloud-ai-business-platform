@@ -1,0 +1,295 @@
+{% extends 'dashboard_base.html' %}
+{% load static %}
+
+{% block title %}Profit Analysis - ShopCloud{% endblock %}
+
+{% block dashboard_css %}
+<link rel="stylesheet" href="{% static 'css/profit_analysis.css' %}">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+{% endblock %}
+
+{% block dashboard_content %}
+<div class="profit-analysis-container">
+    <div class="page-header">
+        <h1>📊 Profit Analysis</h1>
+        <div class="date-filter">
+            <select id="periodFilter">
+                <option value="today">Today</option>
+                <option value="week">This Week</option>
+                <option value="month" selected>This Month</option>
+                <option value="quarter">This Quarter</option>
+                <option value="year">This Year</option>
+            </select>
+        </div>
+    </div>
+
+    <!-- Key Metrics Cards -->
+    <div class="metrics-grid">
+        <div class="metric-card revenue">
+            <div class="metric-icon">💰</div>
+            <div class="metric-content">
+                <h3>Total Revenue</h3>
+                <div class="metric-value">Rs. {{ total_revenue|floatformat:0 }}</div>
+                <div class="metric-change positive">+{{ revenue_change }}%</div>
+            </div>
+        </div>
+
+        <div class="metric-card profit">
+            <div class="metric-icon">📈</div>
+            <div class="metric-content">
+                <h3>Net Profit</h3>
+                <div class="metric-value">Rs. {{ net_profit|floatformat:0 }}</div>
+                <div class="metric-change positive">+{{ profit_change }}%</div>
+            </div>
+        </div>
+
+        <div class="metric-card margin">
+            <div class="metric-icon">📊</div>
+            <div class="metric-content">
+                <h3>Profit Margin</h3>
+                <div class="metric-value">{{ profit_margin|floatformat:1 }}%</div>
+                <div class="metric-change">{{ margin_trend }}</div>
+            </div>
+        </div>
+
+        <div class="metric-card cost">
+            <div class="metric-icon">💸</div>
+            <div class="metric-content">
+                <h3>Total Cost</h3>
+                <div class="metric-value">Rs. {{ total_cost|floatformat:0 }}</div>
+                <div class="metric-change negative">{{ cost_change }}%</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Charts Section -->
+    <div class="charts-section">
+        <div class="chart-container">
+            <h3>Profit Trend</h3>
+            <canvas id="profitTrendChart"></canvas>
+        </div>
+
+        <div class="chart-container">
+            <h3>Revenue vs Cost</h3>
+            <canvas id="revenueCostChart"></canvas>
+        </div>
+    </div>
+
+    <!-- Product Profitability Table -->
+    <div class="profitability-table">
+        <h3>Product Profitability Analysis</h3>
+        <div class="table-controls">
+            <input type="text" id="productSearch" placeholder="🔍 Search products..." autocomplete="off">
+            <select id="sortBy">
+                <option value="profit_desc">📈 Highest Profit</option>
+                <option value="profit_asc">📉 Lowest Profit</option>
+                <option value="margin_desc">💹 Highest Margin</option>
+                <option value="margin_asc">📊 Lowest Margin</option>
+                <option value="quantity_desc">🔥 Most Sold</option>
+                <option value="quantity_asc">❄️ Least Sold</option>
+                <option value="revenue_desc">💰 Highest Revenue</option>
+                <option value="revenue_asc">💸 Lowest Revenue</option>
+                <option value="name_asc">🔤 Name A-Z</option>
+                <option value="name_desc">🔤 Name Z-A</option>
+            </select>
+            <button id="exportTableBtn" class="btn-export">📊 Export Table</button>
+            <button id="refreshBtn" class="btn-export" onclick="refreshData()">🔄 Refresh</button>
+        </div>
+        
+        <table id="profitabilityTable">
+            <thead>
+                <tr>
+                    <th>Product</th>
+                    <th>Qty Sold</th>
+                    <th>Revenue</th>
+                    <th>Cost</th>
+                    <th>Profit</th>
+                    <th>Margin %</th>
+                    <th>Performance</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for product in product_analysis %}
+                <tr>
+                    <td>{{ product.name }}</td>
+                    <td>{{ product.quantity_sold }}</td>
+                    <td>Rs. {{ product.revenue|floatformat:0 }}</td>
+                    <td>Rs. {{ product.cost|floatformat:0 }}</td>
+                    <td class="profit-cell">Rs. {{ product.profit|floatformat:0 }}</td>
+                    <td>{{ product.margin|floatformat:1 }}%</td>
+                    <td>
+                        <div class="performance-bar">
+                            <div class="bar-fill" style="width: {{ product.performance }}%"></div>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Category Analysis -->
+    <div class="category-analysis">
+        <h3>Category Performance</h3>
+        <div class="category-grid">
+            {% for category in category_analysis %}
+            <div class="category-card">
+                <h4>{{ category.name }}</h4>
+                <div class="category-stats">
+                    <div class="stat">
+                        <span class="label">Revenue:</span>
+                        <span class="value">Rs. {{ category.revenue|floatformat:0 }}</span>
+                    </div>
+                    <div class="stat">
+                        <span class="label">Profit:</span>
+                        <span class="value profit">Rs. {{ category.profit|floatformat:0 }}</span>
+                    </div>
+                    <div class="stat">
+                        <span class="label">Margin:</span>
+                        <span class="value">{{ category.margin|floatformat:1 }}%</span>
+                    </div>
+                </div>
+                <div class="category-chart">
+                    <canvas id="categoryChart{{ forloop.counter }}"></canvas>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- AI Insights -->
+    <div class="ai-insights">
+        <h3>🤖 AI Profit Insights</h3>
+        <div class="insights-grid">
+            <div class="insight-card recommendation">
+                <h4>💡 Recommendations</h4>
+                <ul>
+                    {% for recommendation in ai_recommendations %}
+                    <li>{{ recommendation }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+            
+            <div class="insight-card alerts">
+                <h4>⚠️ Profit Alerts</h4>
+                <ul>
+                    {% for alert in profit_alerts %}
+                    <li class="alert-{{ alert.type }}">{{ alert.message }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Export Options -->
+    <div class="export-section">
+        <h3>Export Analysis</h3>
+        <div class="export-buttons">
+            <button class="btn-export" onclick="exportToPDF()" title="Export as PDF (Ctrl+P)">📄 Export PDF</button>
+            <button class="btn-export" onclick="exportToExcel()" title="Export as Excel (Ctrl+E)">📊 Export Excel</button>
+            <button class="btn-export" onclick="shareWhatsApp()" title="Share via WhatsApp">📱 Share WhatsApp</button>
+            <button class="btn-export" onclick="printReport()" title="Print Report">🖨️ Print</button>
+            <button class="btn-export" onclick="emailReport()" title="Email Report">📧 Email</button>
+        </div>
+    </div>
+</div>
+
+<script>
+// Chart data from Django context
+const chartData = {
+    profitTrend: {{ profit_trend_data|safe }},
+    revenueCost: {{ revenue_cost_data|safe }},
+    categories: {{ category_chart_data|safe }}
+};
+
+// Initialize charts when DOM is ready
+document.addEventListener('DOMContentLoaded', function() {
+    if (typeof initializeProfitCharts === 'function') {
+        initializeProfitCharts();
+        setupTableFilters();
+        setupPeriodFilter();
+        loadUserPreferences();
+    } else {
+        // Fallback initialization if main JS not loaded
+        initBasicCharts();
+    }
+});
+
+// Basic chart initialization fallback
+function initBasicCharts() {
+    // Profit Trend Chart
+    const profitCtx = document.getElementById('profitTrendChart');
+    if (profitCtx && chartData.profitTrend) {
+        new Chart(profitCtx, {
+            type: 'line',
+            data: {
+                labels: chartData.profitTrend.labels || [],
+                datasets: [{
+                    label: 'Profit',
+                    data: chartData.profitTrend.profits || [],
+                    borderColor: '#27ae60',
+                    backgroundColor: 'rgba(39, 174, 96, 0.1)',
+                    fill: true
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: { y: { beginAtZero: true } }
+            }
+        });
+    }
+    
+    // Revenue vs Cost Chart
+    const revenueCtx = document.getElementById('revenueCostChart');
+    if (revenueCtx && chartData.revenueCost) {
+        new Chart(revenueCtx, {
+            type: 'bar',
+            data: {
+                labels: chartData.revenueCost.labels || [],
+                datasets: [{
+                    label: 'Revenue',
+                    data: chartData.revenueCost.revenue || [],
+                    backgroundColor: '#27ae60'
+                }, {
+                    label: 'Cost',
+                    data: chartData.revenueCost.cost || [],
+                    backgroundColor: '#e74c3c'
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: { y: { beginAtZero: true } }
+            }
+        });
+    }
+    
+    // Category Charts
+    if (chartData.categories) {
+        chartData.categories.forEach((category, index) => {
+            const ctx = document.getElementById(`categoryChart${index + 1}`);
+            if (ctx) {
+                new Chart(ctx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['Profit', 'Cost'],
+                        datasets: [{
+                            data: [category.profit || 0, category.cost || 0],
+                            backgroundColor: ['#27ae60', '#e74c3c']
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        cutout: '60%'
+                    }
+                });
+            }
+        });
+    }
+}
+</script>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/profit_analysis.js' %}"></script>
+<script src="{% static 'js/profit_analysis_data.js' %}"></script>
+{% endblock %}

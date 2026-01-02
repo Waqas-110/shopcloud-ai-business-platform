@@ -1,0 +1,281 @@
+{% extends 'dashboard_base.html' %}
+
+{% block title %}Data Backup - ShopCloud{% endblock %}
+
+{% block dashboard_content %}
+<div class="container-fluid">
+    <div class="row">
+        <!-- Sidebar -->
+        <div class="col-md-2 sidebar">
+            <div class="sidebar-sticky">
+                <ul class="nav flex-column">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'dashboard:main' %}">
+                            <i class="fas fa-tachometer-alt"></i> Dashboard
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'products:list' %}">
+                            <i class="fas fa-box"></i> Products
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'billing:pos' %}">
+                            <i class="fas fa-cash-register"></i> POS
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'reports:dashboard' %}">
+                            <i class="fas fa-chart-bar"></i> Reports
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'ai_insights:dashboard' %}">
+                            <i class="fas fa-brain"></i> AI Insights
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="{% url 'settings:shop_settings' %}">
+                            <i class="fas fa-cog"></i> Settings
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Main content -->
+        <div class="col-md-10 main-content">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2><i class="fas fa-download"></i> Data Backup & Export</h2>
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a href="{% url 'dashboard:main' %}">Dashboard</a></li>
+                        <li class="breadcrumb-item"><a href="{% url 'settings:shop_settings' %}">Settings</a></li>
+                        <li class="breadcrumb-item active">Data Backup</li>
+                    </ol>
+                </nav>
+            </div>
+
+            <!-- Settings Navigation -->
+            <div class="row mb-4">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="btn-group" role="group">
+                                <a href="{% url 'settings:shop_settings' %}" class="btn btn-outline-primary">
+                                    <i class="fas fa-store"></i> Shop Settings
+                                </a>
+                                <a href="{% url 'settings:change_password' %}" class="btn btn-outline-primary">
+                                    <i class="fas fa-lock"></i> Change Password
+                                </a>
+                                <a href="{% url 'settings:preferences' %}" class="btn btn-outline-primary">
+                                    <i class="fas fa-sliders-h"></i> Preferences
+                                </a>
+                                <a href="{% url 'settings:payment_options' %}" class="btn btn-outline-primary">
+                                    <i class="fas fa-credit-card"></i> Payment Options
+                                </a>
+                                <a href="{% url 'settings:data_backup' %}" class="btn btn-primary">
+                                    <i class="fas fa-download"></i> Data Backup
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Data Overview -->
+            <div class="row mb-4">
+                <div class="col-md-3">
+                    <div class="card text-center">
+                        <div class="card-body">
+                            <i class="fas fa-box fa-2x text-primary mb-2"></i>
+                            <h4>{{ products_count }}</h4>
+                            <p class="text-muted">Products</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card text-center">
+                        <div class="card-body">
+                            <i class="fas fa-receipt fa-2x text-success mb-2"></i>
+                            <h4>{{ bills_count }}</h4>
+                            <p class="text-muted">Bills</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card text-center">
+                        <div class="card-body">
+                            <i class="fas fa-tags fa-2x text-warning mb-2"></i>
+                            <h4>{{ categories_count }}</h4>
+                            <p class="text-muted">Categories</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card text-center">
+                        <div class="card-body">
+                            <i class="fas fa-database fa-2x text-info mb-2"></i>
+                            <h4>{{ shop.name }}</h4>
+                            <p class="text-muted">Shop Data</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Export Options -->
+            <div class="row">
+                <div class="col-md-8">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5><i class="fas fa-download"></i> Export Data</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="card border-primary">
+                                        <div class="card-body text-center">
+                                            <i class="fas fa-box fa-3x text-primary mb-3"></i>
+                                            <h5>Products Export</h5>
+                                            <p class="text-muted">Export all products with categories, prices, and stock information</p>
+                                            <a href="{% url 'settings:export_data' %}?type=products" class="btn btn-primary">
+                                                <i class="fas fa-download"></i> Export Products (CSV)
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <div class="card border-success">
+                                        <div class="card-body text-center">
+                                            <i class="fas fa-receipt fa-3x text-success mb-3"></i>
+                                            <h5>Bills Export</h5>
+                                            <p class="text-muted">Export all sales bills with customer and payment details</p>
+                                            <a href="{% url 'settings:export_data' %}?type=bills" class="btn btn-success">
+                                                <i class="fas fa-download"></i> Export Bills (CSV)
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row mt-4">
+                                <div class="col-12">
+                                    <div class="card border-warning">
+                                        <div class="card-body text-center">
+                                            <i class="fas fa-database fa-3x text-warning mb-3"></i>
+                                            <h5>Complete Backup</h5>
+                                            <p class="text-muted">Export all shop data including products, bills, categories, and settings</p>
+                                            <a href="{% url 'settings:export_data' %}?type=all" class="btn btn-warning">
+                                                <i class="fas fa-download"></i> Full Backup (JSON)
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <div class="card">
+                        <div class="card-header">
+                            <h6><i class="fas fa-info-circle"></i> Backup Information</h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="alert alert-info">
+                                <h6><i class="fas fa-lightbulb"></i> Backup Tips:</h6>
+                                <ul class="mb-0">
+                                    <li>Take regular backups weekly</li>
+                                    <li>Store backups in safe location</li>
+                                    <li>CSV files can be opened in Excel</li>
+                                    <li>JSON backup contains all data</li>
+                                </ul>
+                            </div>
+
+                            <div class="alert alert-warning">
+                                <h6><i class="fas fa-exclamation-triangle"></i> Important:</h6>
+                                <p class="mb-0">Backup files may contain sensitive business data. Keep them secure and don't share publicly.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card mt-3">
+                        <div class="card-header">
+                            <h6><i class="fas fa-clock"></i> Backup Schedule</h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="auto_backup">
+                                <label class="form-check-label" for="auto_backup">
+                                    Enable Auto Backup
+                                </label>
+                            </div>
+                            <small class="text-muted">Automatically backup data weekly</small>
+                            
+                            <hr>
+                            
+                            <div class="mb-2">
+                                <strong>Last Backup:</strong><br>
+                                <small class="text-muted">Never</small>
+                            </div>
+                            
+                            <div class="mb-2">
+                                <strong>Next Backup:</strong><br>
+                                <small class="text-muted">Not scheduled</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Restore Section -->
+            <div class="row mt-4">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5><i class="fas fa-upload"></i> Restore Data</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="alert alert-danger">
+                                <h6><i class="fas fa-exclamation-triangle"></i> Warning:</h6>
+                                <p class="mb-0">Restoring data will overwrite existing data. Make sure to backup current data before restoring.</p>
+                            </div>
+                            
+                            <form>
+                                <div class="mb-3">
+                                    <label for="backup_file" class="form-label">Select Backup File</label>
+                                    <input type="file" class="form-control" id="backup_file" accept=".json,.csv">
+                                </div>
+                                <button type="button" class="btn btn-danger" disabled>
+                                    <i class="fas fa-upload"></i> Restore Data (Coming Soon)
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Add loading states to export buttons
+    const exportButtons = document.querySelectorAll('a[href*="export_data"]');
+    exportButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            const originalText = this.innerHTML;
+            this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Exporting...';
+            this.classList.add('disabled');
+            
+            // Reset button after 3 seconds
+            setTimeout(() => {
+                this.innerHTML = originalText;
+                this.classList.remove('disabled');
+            }, 3000);
+        });
+    });
+});
+</script>
+{% endblock %}

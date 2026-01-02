@@ -1,0 +1,42 @@
+<div class="sidebar">
+    {% load static %}
+    <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 20px;">
+        <img src="{% static 'images/logo-icon.svg' %}" alt="ShopCloud" style="height: 32px; width: auto;">
+        <h3 style="margin: 0;">ShopCloud</h3>
+    </div>
+    <nav>
+        <a href="{% url 'dashboard:main' %}">📊 Dashboard</a>
+        <a href="{% url 'products:list' %}">📦 Products</a>
+        <a href="{% url 'products:categories' %}">🏷️ Categories</a>
+        <a href="{% url 'billing:pos' %}">💰 POS</a>
+        <a href="{% url 'billing:bills_list' %}">🧾 Bills</a>
+        <a href="{% url 'reports:dashboard' %}">📈 Reports</a>
+        <a href="{% url 'ai_insights:dashboard' %}">🤖 AI Insights</a>
+        <a href="{% url 'settings:shop_settings' %}">⚙️ Settings</a>
+        <a href="{% url 'users:logout' %}">🚪 Logout</a>
+    </nav>
+</div>
+
+<style>
+.sidebar {
+    background: #2c3e50;
+    color: white;
+    padding: 20px;
+    min-height: 100vh;
+    width: 250px;
+}
+.sidebar h3 {
+    margin-bottom: 30px;
+    color: #ecf0f1;
+}
+.sidebar nav a {
+    display: block;
+    color: #bdc3c7;
+    text-decoration: none;
+    padding: 10px 0;
+    border-bottom: 1px solid #34495e;
+}
+.sidebar nav a:hover {
+    color: #3498db;
+}
+</style>

@@ -1,0 +1,395 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}ShopCloud - آپکی شاپ، آپکے ہاتھ میں{% endblock %}
+
+{% block extra_css %}
+<style>
+.hero {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 100px 20px;
+    min-height: 90vh;
+    display: flex;
+    align-items: center;
+}
+
+.hero-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 60px;
+    align-items: center;
+}
+
+.hero-content h1 {
+    font-size: 3.5rem;
+    font-weight: 800;
+    margin-bottom: 20px;
+    line-height: 1.2;
+}
+
+.hero-content h2 {
+    font-size: 2rem;
+    font-weight: 600;
+    margin-bottom: 25px;
+    color: #fbbf24;
+}
+
+.hero-content p {
+    font-size: 1.25rem;
+    line-height: 1.8;
+    margin-bottom: 35px;
+    opacity: 0.95;
+}
+
+.hero-buttons {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+.btn {
+    padding: 15px 35px;
+    border-radius: 50px;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 1.1rem;
+    transition: all 0.3s ease;
+    display: inline-block;
+    border: none;
+    cursor: pointer;
+}
+
+.btn-primary {
+    background: #10b981;
+    color: white;
+    box-shadow: 0 4px 15px rgba(16, 185, 129, 0.4);
+}
+
+.btn-primary:hover {
+    background: #059669;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(16, 185, 129, 0.6);
+}
+
+.btn-secondary {
+    background: rgba(255, 255, 255, 0.2);
+    color: white;
+    border: 2px solid white;
+}
+
+.btn-secondary:hover {
+    background: white;
+    color: #667eea;
+    transform: translateY(-2px);
+}
+
+.hero-image {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.mockup-phone {
+    width: 300px;
+    height: 600px;
+    background: #1f2937;
+    border-radius: 40px;
+    padding: 20px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    position: relative;
+}
+
+.mockup-phone::before {
+    content: '';
+    position: absolute;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100px;
+    height: 25px;
+    background: #111827;
+    border-radius: 0 0 15px 15px;
+}
+
+.screen {
+    width: 100%;
+    height: 100%;
+    background: white;
+    border-radius: 25px;
+    overflow: hidden;
+}
+
+.pos-demo {
+    padding: 20px;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.demo-header {
+    background: #2563eb;
+    color: white;
+    padding: 15px;
+    text-align: center;
+    font-weight: bold;
+    font-size: 1.2rem;
+    margin-bottom: 20px;
+    border-radius: 10px;
+}
+
+.demo-items {
+    flex: 1;
+}
+
+.demo-item {
+    padding: 15px;
+    border-bottom: 1px solid #e5e7eb;
+    display: flex;
+    justify-content: space-between;
+    font-size: 1rem;
+}
+
+.demo-total {
+    margin-top: 20px;
+    padding: 20px;
+    background: #10b981;
+    color: white;
+    text-align: center;
+    font-weight: bold;
+    font-size: 1.3rem;
+    border-radius: 10px;
+}
+
+.features-preview {
+    padding: 100px 20px;
+    background: #f9fafb;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.features-preview h2 {
+    text-align: center;
+    font-size: 2.5rem;
+    margin-bottom: 60px;
+    color: #1f2937;
+}
+
+.features-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 30px;
+}
+
+.feature-card {
+    background: white;
+    padding: 40px 30px;
+    border-radius: 20px;
+    text-align: center;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    transition: all 0.3s ease;
+}
+
+.feature-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+}
+
+.feature-icon {
+    font-size: 4rem;
+    margin-bottom: 20px;
+}
+
+.feature-card h3 {
+    font-size: 1.5rem;
+    margin-bottom: 15px;
+    color: #1f2937;
+}
+
+.feature-card p {
+    color: #6b7280;
+    line-height: 1.6;
+    font-size: 1rem;
+}
+
+.cta {
+    padding: 100px 20px;
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    color: white;
+    text-align: center;
+}
+
+.cta h2 {
+    font-size: 3rem;
+    margin-bottom: 20px;
+}
+
+.cta p {
+    font-size: 1.3rem;
+    margin-bottom: 40px;
+    opacity: 0.95;
+}
+
+.btn-large {
+    padding: 20px 50px;
+    font-size: 1.3rem;
+}
+
+.stats-section {
+    padding: 80px 20px;
+    background: white;
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 40px;
+    text-align: center;
+}
+
+.stat-item h3 {
+    font-size: 3rem;
+    color: #2563eb;
+    margin-bottom: 10px;
+}
+
+.stat-item p {
+    font-size: 1.2rem;
+    color: #6b7280;
+}
+
+@media (max-width: 768px) {
+    .hero-container {
+        grid-template-columns: 1fr;
+        text-align: center;
+    }
+    
+    .hero-content h1 {
+        font-size: 2.5rem;
+    }
+    
+    .mockup-phone {
+        width: 250px;
+        height: 500px;
+    }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<section class="hero">
+    <div class="hero-container">
+        <div class="hero-content">
+            <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 20px;">
+                <img src="{% static 'images/logo.svg' %}" alt="ShopCloud Logo" style="height: 70px; width: auto;">
+            </div>
+            <h1>ShopCloud</h1>
+            <h2>آپکی شاپ، آپکے ہاتھ میں</h2>
+            <p>پاکستان کی پہلی مفت کلاؤڈ بیسڈ POS سسٹم۔ اپنی شاپ کو ڈیجیٹل بنائیں، سیلز بڑھائیں، اور AI کے ساتھ سمارٹ فیصلے لیں۔</p>
+            <div class="hero-buttons">
+                <a href="{% url 'users:signup' %}" class="btn btn-primary">مفت میں شروع کریں</a>
+                <a href="{% url 'landing:features' %}" class="btn btn-secondary">فیچرز دیکھیں</a>
+            </div>
+        </div>
+        <div class="hero-image">
+            <div class="mockup-phone">
+                <div class="screen">
+                    <div class="pos-demo">
+                        <div class="demo-header">ShopCloud POS</div>
+                        <div class="demo-items">
+                            <div class="demo-item">
+                                <span>پپسی 250ml</span>
+                                <span>Rs.50</span>
+                            </div>
+                            <div class="demo-item">
+                                <span>چپس</span>
+                                <span>Rs.30</span>
+                            </div>
+                            <div class="demo-item">
+                                <span>بسکٹ</span>
+                                <span>Rs.100</span>
+                            </div>
+                        </div>
+                        <div class="demo-total">کل: Rs.180</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="stats-section">
+    <div class="container">
+        <div class="stats-grid">
+            <div class="stat-item">
+                <h3>100%</h3>
+                <p>مفت</p>
+            </div>
+            <div class="stat-item">
+                <h3>24/7</h3>
+                <p>دستیابی</p>
+            </div>
+            <div class="stat-item">
+                <h3>∞</h3>
+                <p>بلا محدود</p>
+            </div>
+            <div class="stat-item">
+                <h3>AI</h3>
+                <p>ذہین تجزیہ</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="features-preview">
+    <div class="container">
+        <h2>کیوں ShopCloud منتخب کریں؟</h2>
+        <div class="features-grid">
+            <div class="feature-card">
+                <div class="feature-icon">📱</div>
+                <h3>موبائل فرینڈلی</h3>
+                <p>کسی بھی فون یا ٹیبلٹ پر چلائیں</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">💰</div>
+                <h3>بالکل مفت</h3>
+                <p>کوئی ماہانہ فیس نہیں، لائف ٹائم مفت</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">🤖</div>
+                <h3>AI بصیرت</h3>
+                <p>ذہین مشورے اور سیلز پیشن گوئی</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">📊</div>
+                <h3>رپورٹس اور تجزیہ</h3>
+                <p>روزانہ، ہفتہ وار، ماہانہ سیلز رپورٹس</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">🛒</div>
+                <h3>تیز بلنگ</h3>
+                <p>فوری بل بنائیں اور پرنٹ کریں</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">📦</div>
+                <h3>اسٹاک مینجمنٹ</h3>
+                <p>خودکار اسٹاک الرٹس اور انوینٹری</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="cta">
+    <div class="container">
+        <h2>آج ہی شروع کریں!</h2>
+        <p>صرف 2 منٹ میں سیٹ اپ مکمل کریں</p>
+        <a href="{% url 'users:signup' %}" class="btn btn-primary btn-large">مفت اکاؤنٹ بنائیں</a>
+    </div>
+</section>
+{% endblock %}
+

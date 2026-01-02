@@ -1,0 +1,290 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Features - ShopCloud{% endblock %}
+
+{% block extra_css %}
+<style>
+.features-hero {
+    background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+    color: white;
+    padding: 100px 20px;
+    text-align: center;
+}
+
+.features-hero h1 {
+    font-size: 3.5rem;
+    font-weight: 800;
+    margin-bottom: 20px;
+}
+
+.features-hero p {
+    font-size: 1.5rem;
+    opacity: 0.95;
+}
+
+.features-detailed {
+    padding: 100px 20px;
+    background: #f9fafb;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.features-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 30px;
+    margin-top: 50px;
+}
+
+.feature-item {
+    background: white;
+    padding: 40px 30px;
+    border-radius: 20px;
+    text-align: center;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    transition: all 0.3s ease;
+    border: 2px solid transparent;
+}
+
+.feature-item:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+    border-color: #2563eb;
+}
+
+.feature-icon {
+    font-size: 4.5rem;
+    margin-bottom: 25px;
+    display: block;
+}
+
+.feature-item h3 {
+    font-size: 1.8rem;
+    margin-bottom: 15px;
+    color: #1f2937;
+    font-weight: 700;
+}
+
+.feature-item p {
+    color: #6b7280;
+    line-height: 1.8;
+    font-size: 1.1rem;
+}
+
+.cta-section {
+    padding: 100px 20px;
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    color: white;
+    text-align: center;
+}
+
+.cta-section h2 {
+    font-size: 3rem;
+    margin-bottom: 20px;
+    font-weight: 800;
+}
+
+.cta-section p {
+    font-size: 1.3rem;
+    margin-bottom: 40px;
+    opacity: 0.95;
+}
+
+.btn {
+    display: inline-block;
+    padding: 15px 35px;
+    border-radius: 50px;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 1.1rem;
+    transition: all 0.3s ease;
+    border: none;
+    cursor: pointer;
+}
+
+.btn-primary {
+    background: white;
+    color: #10b981;
+    box-shadow: 0 4px 15px rgba(255, 255, 255, 0.3);
+}
+
+.btn-primary:hover {
+    background: #f3f4f6;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(255, 255, 255, 0.4);
+}
+
+.btn-large {
+    padding: 20px 50px;
+    font-size: 1.3rem;
+}
+
+.stats-bar {
+    background: white;
+    padding: 60px 20px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 40px;
+    text-align: center;
+}
+
+.stat-item h3 {
+    font-size: 3.5rem;
+    color: #2563eb;
+    margin-bottom: 10px;
+    font-weight: 800;
+}
+
+.stat-item p {
+    font-size: 1.2rem;
+    color: #6b7280;
+    font-weight: 600;
+}
+
+@media (max-width: 768px) {
+    .features-hero h1 {
+        font-size: 2.5rem;
+    }
+    
+    .features-hero p {
+        font-size: 1.2rem;
+    }
+    
+    .features-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .cta-section h2 {
+        font-size: 2.2rem;
+    }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<section class="features-hero">
+    <div class="container">
+        <h1>ShopCloud Features</h1>
+        <p>Pakistan's most advanced and FREE POS system</p>
+    </div>
+</section>
+
+<section class="stats-bar">
+    <div class="container">
+        <div class="stats-grid">
+            <div class="stat-item">
+                <h3>100%</h3>
+                <p>Free</p>
+            </div>
+            <div class="stat-item">
+                <h3>24/7</h3>
+                <p>Available</p>
+            </div>
+            <div class="stat-item">
+                <h3>∞</h3>
+                <p>Unlimited</p>
+            </div>
+            <div class="stat-item">
+                <h3>AI</h3>
+                <p>Smart Analytics</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="features-detailed">
+    <div class="container">
+        <div class="features-grid">
+            <div class="feature-item">
+                <div class="feature-icon">📱</div>
+                <h3>Mobile Friendly</h3>
+                <p>Works perfectly on any smartphone, tablet or computer. Whether internet is slow or fast, ShopCloud works everywhere.</p>
+            </div>
+            
+            <div class="feature-item">
+                <div class="feature-icon">💰</div>
+                <h3>Completely Free</h3>
+                <p>No monthly fees, setup charges or hidden costs. Lifetime free service with unlimited bills and products.</p>
+            </div>
+            
+            <div class="feature-item">
+                <div class="feature-icon">🛒</div>
+                <h3>Fast POS System</h3>
+                <p>Barcode scanning, quick billing, automatic calculations and instant bill generation. Print professional bills or send via WhatsApp.</p>
+            </div>
+            
+            <div class="feature-item">
+                <div class="feature-icon">📊</div>
+                <h3>Sales Analytics</h3>
+                <p>Daily, weekly, monthly sales reports. Best selling products, profit analysis and business insights in one click.</p>
+            </div>
+            
+            <div class="feature-item">
+                <div class="feature-icon">🤖</div>
+                <h3>AI Recommendations</h3>
+                <p>Smart suggestions for inventory management, price optimization and sales improvement. AI helps you grow your business.</p>
+            </div>
+            
+            <div class="feature-item">
+                <div class="feature-icon">📦</div>
+                <h3>Inventory Management</h3>
+                <p>Stock tracking, low stock alerts, product categories and automatic reorder suggestions. Never run out of stock.</p>
+            </div>
+            
+            <div class="feature-item">
+                <div class="feature-icon">📄</div>
+                <h3>Bill Generation</h3>
+                <p>Professional PDF bills, WhatsApp sharing, email sending. Print or share digitally.</p>
+            </div>
+            
+            <div class="feature-item">
+                <div class="feature-icon">🏷️</div>
+                <h3>Category Management</h3>
+                <p>Organize products by categories. Easy filtering and searching. Bulk import/export.</p>
+            </div>
+            
+            <div class="feature-item">
+                <div class="feature-icon">💳</div>
+                <h3>Payment Methods</h3>
+                <p>Cash, card, online, or credit payment options. Track all payment methods.</p>
+            </div>
+            
+            <div class="feature-item">
+                <div class="feature-icon">📈</div>
+                <h3>Profit Calculation</h3>
+                <p>Automatic profit calculation, cost price and sale price tracking. See profit on every bill.</p>
+            </div>
+            
+            <div class="feature-item">
+                <div class="feature-icon">🔔</div>
+                <h3>Smart Alerts</h3>
+                <p>Low stock alerts, best selling products notifications, and business insights.</p>
+            </div>
+            
+            <div class="feature-item">
+                <div class="feature-icon">☁️</div>
+                <h3>Cloud Storage</h3>
+                <p>All your data is safely stored in the cloud. Access anytime, anywhere.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="cta-section">
+    <div class="container">
+        <h2>Ready to Transform Your Shop?</h2>
+        <p>Join thousands of shopkeepers using ShopCloud</p>
+        <a href="{% url 'users:signup' %}" class="btn btn-primary btn-large">Get Started Free</a>
+    </div>
+</section>
+{% endblock %}
+
+

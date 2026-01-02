@@ -1,0 +1,275 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}ShopCloud - Your Shop, In Your Hands | آپ کی دکان، آپ کے ہاتھ میں{% endblock %}
+
+{% block extra_css %}
+<style>
+    .language-toggle {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        z-index: 1000;
+        background: #fff;
+        border-radius: 25px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        padding: 5px;
+    }
+    
+    .lang-btn {
+        padding: 8px 15px;
+        border: none;
+        background: transparent;
+        cursor: pointer;
+        border-radius: 20px;
+        font-weight: 500;
+        transition: all 0.3s ease;
+    }
+    
+    .lang-btn.active {
+        background: #007bff;
+        color: white;
+    }
+    
+    .content-urdu, .content-english {
+        display: none;
+    }
+    
+    .content-urdu.active, .content-english.active {
+        display: block;
+    }
+    
+    .logo-container {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        margin-bottom: 20px;
+    }
+    
+    .logo-icon {
+        width: 80px;
+        height: 80px;
+        background: linear-gradient(135deg, #007bff, #0056b3);
+        border-radius: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 40px;
+        color: white;
+        box-shadow: 0 8px 25px rgba(0,123,255,0.3);
+    }
+    
+    .hero {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 100px 0;
+        text-align: center;
+    }
+    
+    .hero h1 {
+        font-size: 3.5rem;
+        margin-bottom: 10px;
+        font-weight: 700;
+    }
+    
+    .hero h2 {
+        font-size: 1.8rem;
+        margin-bottom: 20px;
+        opacity: 0.9;
+    }
+    
+    .hero p {
+        font-size: 1.2rem;
+        margin-bottom: 30px;
+        max-width: 600px;
+        margin-left: auto;
+        margin-right: auto;
+        line-height: 1.6;
+    }
+    
+    .features-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 30px;
+        margin-top: 50px;
+    }
+    
+    .feature-card {
+        background: white;
+        padding: 30px;
+        border-radius: 15px;
+        text-align: center;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        transition: transform 0.3s ease;
+    }
+    
+    .feature-card:hover {
+        transform: translateY(-5px);
+    }
+    
+    .feature-icon {
+        font-size: 3rem;
+        margin-bottom: 20px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Language Toggle -->
+<div class="language-toggle">
+    <button class="lang-btn active" onclick="switchLanguage('urdu')">اردو</button>
+    <button class="lang-btn" onclick="switchLanguage('english')">English</button>
+</div>
+
+<!-- Urdu Content -->
+<div class="content-urdu active">
+    <section class="hero">
+        <div class="hero-container">
+            <div class="hero-content">
+                <div class="logo-container">
+                    <div class="logo-icon">🏪</div>
+                    <div>
+                        <h1>شاپ کلاؤڈ</h1>
+                        <h2>آپ کی دکان، آپ کے ہاتھ میں</h2>
+                    </div>
+                </div>
+                <p>پاکستان کا پہلا مفت کلاؤڈ بیسڈ POS سسٹم۔ اپنی دکان کو ڈیجیٹل بنائیں، سیلز بڑھائیں، اور AI کے ساتھ سمارٹ فیصلے لیں۔</p>
+                <div class="hero-buttons">
+                    <a href="{% url 'users:signup' %}" class="btn btn-primary">مفت میں شروع کریں</a>
+                    <a href="{% url 'landing:features' %}" class="btn btn-secondary">خصوصیات دیکھیں</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="features-preview">
+        <div class="container">
+            <h2>کیوں منتخب کریں شاپ کلاؤڈ؟</h2>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">📱</div>
+                    <h3>موبائل فرینڈلی</h3>
+                    <p>کسی بھی فون یا ٹیبلٹ پر چلائیں</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">💰</div>
+                    <h3>بالکل مفت</h3>
+                    <p>کوئی ماہانہ فیس نہیں، زندگی بھر مفت</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🤖</div>
+                    <h3>AI انسائٹس</h3>
+                    <p>سمارٹ تجاویز اور سیلز کی پیشن گوئی</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">📊</div>
+                    <h3>رپورٹس اور تجزیات</h3>
+                    <p>روزانہ، ہفتہ وار، ماہانہ سیلز رپورٹس</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="cta">
+        <div class="container">
+            <h2>آج ہی شروع کریں!</h2>
+            <p>صرف 2 منٹ میں سیٹ اپ مکمل کریں</p>
+            <a href="{% url 'users:signup' %}" class="btn btn-primary btn-large">مفت اکاؤنٹ بنائیں</a>
+        </div>
+    </section>
+</div>
+
+<!-- English Content -->
+<div class="content-english">
+    <section class="hero">
+        <div class="hero-container">
+            <div class="hero-content">
+                <div class="logo-container">
+                    <div class="logo-icon">🏪</div>
+                    <div>
+                        <h1>ShopCloud</h1>
+                        <h2>Your Shop, In Your Hands</h2>
+                    </div>
+                </div>
+                <p>Pakistan's first FREE cloud-based POS system. Digitize your shop, boost sales, and make smart decisions with AI insights.</p>
+                <div class="hero-buttons">
+                    <a href="{% url 'users:signup' %}" class="btn btn-primary">Start Free</a>
+                    <a href="{% url 'landing:features' %}" class="btn btn-secondary">View Features</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="features-preview">
+        <div class="container">
+            <h2>Why Choose ShopCloud?</h2>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">📱</div>
+                    <h3>Mobile Friendly</h3>
+                    <p>Works on any phone or tablet</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">💰</div>
+                    <h3>Completely FREE</h3>
+                    <p>No monthly fees, lifetime free</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🤖</div>
+                    <h3>AI Insights</h3>
+                    <p>Smart suggestions and sales predictions</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">📊</div>
+                    <h3>Reports & Analytics</h3>
+                    <p>Daily, weekly, monthly sales reports</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="cta">
+        <div class="container">
+            <h2>Get Started Today!</h2>
+            <p>Complete setup in just 2 minutes</p>
+            <a href="{% url 'users:signup' %}" class="btn btn-primary btn-large">Create Free Account</a>
+        </div>
+    </section>
+</div>
+
+<script>
+function switchLanguage(lang) {
+    // Hide all content
+    document.querySelectorAll('.content-urdu, .content-english').forEach(el => {
+        el.classList.remove('active');
+    });
+    
+    // Remove active class from all buttons
+    document.querySelectorAll('.lang-btn').forEach(btn => {
+        btn.classList.remove('active');
+    });
+    
+    // Show selected content and activate button
+    if (lang === 'urdu') {
+        document.querySelector('.content-urdu').classList.add('active');
+        document.querySelector('.lang-btn[onclick*="urdu"]').classList.add('active');
+        document.documentElement.lang = 'ur';
+        document.documentElement.dir = 'rtl';
+    } else {
+        document.querySelector('.content-english').classList.add('active');
+        document.querySelector('.lang-btn[onclick*="english"]').classList.add('active');
+        document.documentElement.lang = 'en';
+        document.documentElement.dir = 'ltr';
+    }
+    
+    // Save preference
+    localStorage.setItem('preferred-language', lang);
+}
+
+// Load saved language preference
+document.addEventListener('DOMContentLoaded', function() {
+    const savedLang = localStorage.getItem('preferred-language') || 'urdu';
+    switchLanguage(savedLang);
+});
+</script>
+{% endblock %}

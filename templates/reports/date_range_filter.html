@@ -1,0 +1,115 @@
+<!-- Custom Date Range Filter Component -->
+<div class="date-range-filter card mb-4">
+    <div class="card-body">
+        <form method="get" id="dateRangeForm">
+            <div class="row align-items-end">
+                <!-- Preset Options -->
+                <div class="col-md-3">
+                    <label class="form-label">Quick Select</label>
+                    <select class="form-select" name="preset" id="presetSelect" onchange="handlePresetChange()">
+                        <option value="custom" {% if preset == 'custom' %}selected{% endif %}>Custom Range</option>
+                        <option value="today" {% if preset == 'today' %}selected{% endif %}>Today</option>
+                        <option value="yesterday" {% if preset == 'yesterday' %}selected{% endif %}>Yesterday</option>
+                        <option value="last_7_days" {% if preset == 'last_7_days' %}selected{% endif %}>Last 7 Days</option>
+                        <option value="this_week" {% if preset == 'this_week' %}selected{% endif %}>This Week</option>
+                        <option value="last_30_days" {% if preset == 'last_30_days' %}selected{% endif %}>Last 30 Days</option>
+                        <option value="this_month" {% if preset == 'this_month' %}selected{% endif %}>This Month</option>
+                        <option value="last_month" {% if preset == 'last_month' %}selected{% endif %}>Last Month</option>
+                        <option value="this_quarter" {% if preset == 'this_quarter' %}selected{% endif %}>This Quarter</option>
+                        <option value="this_year" {% if preset == 'this_year' %}selected{% endif %}>This Year</option>
+                    </select>
+                </div>
+                
+                <!-- Custom Date Inputs -->
+                <div class="col-md-3" id="customDateInputs">
+                    <label class="form-label">Start Date</label>
+                    <input type="date" class="form-control" name="start_date" id="startDate" value="{{ start_date|date:'Y-m-d' }}">
+                </div>
+                
+                <div class="col-md-3" id="customDateInputs2">
+                    <label class="form-label">End Date</label>
+                    <input type="date" class="form-control" name="end_date" id="endDate" value="{{ end_date|date:'Y-m-d' }}">
+                </div>
+                
+                <!-- Action Buttons -->
+                <div class="col-md-3">
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-filter"></i> Apply Filter
+                        </button>
+                        <button type="button" class="btn btn-outline-secondary" onclick="resetDateFilter()">
+                            <i class="fas fa-refresh"></i> Reset
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Date Range Display -->
+            <div class="row mt-3">
+                <div class="col-12">
+                    <div class="alert alert-info mb-0">
+                        <i class="fas fa-calendar"></i> 
+                        <strong>Selected Period:</strong> 
+                        {{ start_date|date:"M d, Y" }} to {{ end_date|date:"M d, Y" }}
+                        <span class="ms-2 text-muted">
+                            ({{ start_date|timesince:end_date|cut:"," }})
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+function handlePresetChange() {
+    const preset = document.getElementById('presetSelect').value;
+    const customInputs = document.getElementById('customDateInputs');
+    const customInputs2 = document.getElementById('customDateInputs2');
+    
+    if (preset === 'custom') {
+        customInputs.style.display = 'block';
+        customInputs2.style.display = 'block';
+    } else {
+        customInputs.style.display = 'none';
+        customInputs2.style.display = 'none';
+        // Auto-submit for preset selections
+        document.getElementById('dateRangeForm').submit();
+    }
+}
+
+function resetDateFilter() {
+    document.getElementById('presetSelect').value = 'last_7_days';
+    document.getElementById('startDate').value = '';
+    document.getElementById('endDate').value = '';
+    document.getElementById('dateRangeForm').submit();
+}
+
+// Initialize on page load
+document.addEventListener('DOMContentLoaded', function() {
+    handlePresetChange();
+});
+</script>
+
+<style>
+.date-range-filter {
+    border: 1px solid #e3e6f0;
+    border-radius: 8px;
+    box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15);
+}
+
+.date-range-filter .form-label {
+    font-weight: 600;
+    color: #5a5c69;
+    margin-bottom: 0.5rem;
+}
+
+.date-range-filter .btn {
+    font-weight: 600;
+}
+
+.date-range-filter .alert {
+    border-radius: 6px;
+    font-size: 0.9rem;
+}
+</style>

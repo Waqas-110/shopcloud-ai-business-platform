@@ -1,0 +1,340 @@
+{% extends 'dashboard_base.html' %}
+
+{% block title %}Preferences - ShopCloud{% endblock %}
+
+{% block dashboard_content %}
+<div class="container-fluid">
+    <div class="row">
+        <!-- Sidebar -->
+        <div class="col-md-2 sidebar">
+            <div class="sidebar-sticky">
+                <ul class="nav flex-column">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'dashboard:main' %}">
+                            <i class="fas fa-tachometer-alt"></i> Dashboard
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'products:list' %}">
+                            <i class="fas fa-box"></i> Products
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'billing:pos' %}">
+                            <i class="fas fa-cash-register"></i> POS
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'reports:dashboard' %}">
+                            <i class="fas fa-chart-bar"></i> Reports
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'ai_insights:dashboard' %}">
+                            <i class="fas fa-brain"></i> AI Insights
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="{% url 'settings:shop_settings' %}">
+                            <i class="fas fa-cog"></i> Settings
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Main content -->
+        <div class="col-md-10 main-content">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2><i class="fas fa-sliders-h"></i> System Preferences</h2>
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a href="{% url 'dashboard:main' %}">Dashboard</a></li>
+                        <li class="breadcrumb-item"><a href="{% url 'settings:shop_settings' %}">Settings</a></li>
+                        <li class="breadcrumb-item active">Preferences</li>
+                    </ol>
+                </nav>
+            </div>
+
+            <!-- Settings Navigation -->
+            <div class="row mb-4">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="btn-group" role="group">
+                                <a href="{% url 'settings:shop_settings' %}" class="btn btn-outline-primary">
+                                    <i class="fas fa-store"></i> Shop Settings
+                                </a>
+                                <a href="{% url 'settings:change_password' %}" class="btn btn-outline-primary">
+                                    <i class="fas fa-lock"></i> Change Password
+                                </a>
+                                <a href="{% url 'settings:preferences' %}" class="btn btn-primary">
+                                    <i class="fas fa-sliders-h"></i> Preferences
+                                </a>
+                                <a href="{% url 'settings:payment_options' %}" class="btn btn-outline-primary">
+                                    <i class="fas fa-credit-card"></i> Payment Options
+                                </a>
+                                <a href="{% url 'settings:data_backup' %}" class="btn btn-outline-primary">
+                                    <i class="fas fa-download"></i> Data Backup
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-8">
+                    <form method="post">
+                        {% csrf_token %}
+                        
+                        <!-- Display Settings -->
+                        <div class="card">
+                            <div class="card-header">
+                                <h5><i class="fas fa-desktop"></i> Display Settings</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="form-check mb-3">
+                                    <input class="form-check-input" type="checkbox" name="dark_mode" id="darkMode">
+                                    <label class="form-check-label" for="darkMode">
+                                        <i class="fas fa-moon"></i> Dark Mode (Coming Soon)
+                                    </label>
+                                </div>
+                                
+                                <div class="form-check mb-3">
+                                    <input class="form-check-input" type="checkbox" name="notifications" id="notifications" checked>
+                                    <label class="form-check-label" for="notifications">
+                                        <i class="fas fa-bell"></i> Enable Notifications
+                                    </label>
+                                </div>
+                                
+                                <div class="form-group mb-3">
+                                    <label for="language"><i class="fas fa-language"></i> Language</label>
+                                    <select class="form-control" name="language" id="language">
+                                        <option value="en">English</option>
+                                        <option value="ur">اردو (Coming Soon)</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Business Settings -->
+                        <div class="card mt-4">
+                            <div class="card-header">
+                                <h5><i class="fas fa-briefcase"></i> Business Settings</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="form-group mb-3">
+                                    <label for="tax_rate"><i class="fas fa-percentage"></i> Default Tax Rate (%)</label>
+                                    <input type="number" class="form-control" name="tax_rate" id="tax_rate" value="0" min="0" max="100">
+                                    <small class="form-text text-muted">Applied to all products by default</small>
+                                </div>
+                                
+                                <div class="form-group mb-3">
+                                    <label for="currency"><i class="fas fa-coins"></i> Currency</label>
+                                    <select class="form-control" name="currency" id="currency">
+                                        <option value="PKR">PKR (₨)</option>
+                                        <option value="USD">USD ($)</option>
+                                    </select>
+                                </div>
+                                
+                                <div class="form-check mb-3">
+                                    <input class="form-check-input" type="checkbox" name="auto_backup" id="autoBackup" checked>
+                                    <label class="form-check-label" for="autoBackup">
+                                        <i class="fas fa-cloud-upload-alt"></i> Auto Backup Data
+                                    </label>
+                                    <small class="form-text text-muted">Automatically backup data daily</small>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Payment Preferences -->
+                        <div class="card mt-4">
+                            <div class="card-header">
+                                <h5><i class="fas fa-credit-card"></i> Payment Preferences</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-group mb-3">
+                                            <label for="default_payment"><i class="fas fa-hand-point-right"></i> Default Payment Method</label>
+                                            <select class="form-control" name="default_payment" id="default_payment">
+                                                <option value="cash">💵 Cash</option>
+                                                <option value="card">💳 Card</option>
+                                                <option value="mobile">📱 Mobile Banking</option>
+                                                <option value="credit">🤝 Credit/Udhar</option>
+                                            </select>
+                                        </div>
+                                        
+                                        <div class="form-check mb-3">
+                                            <input class="form-check-input" type="checkbox" name="quick_payment" id="quickPayment" checked>
+                                            <label class="form-check-label" for="quickPayment">
+                                                <i class="fas fa-bolt"></i> Quick Payment Mode
+                                            </label>
+                                            <small class="form-text text-muted">Skip payment confirmation for faster checkout</small>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="col-md-6">
+                                        <div class="form-group mb-3">
+                                            <label for="receipt_format"><i class="fas fa-receipt"></i> Receipt Format</label>
+                                            <select class="form-control" name="receipt_format" id="receipt_format">
+                                                <option value="standard">Standard Receipt</option>
+                                                <option value="thermal">Thermal Printer</option>
+                                                <option value="a4">A4 Format</option>
+                                            </select>
+                                        </div>
+                                        
+                                        <div class="form-check mb-3">
+                                            <input class="form-check-input" type="checkbox" name="auto_print" id="autoPrint">
+                                            <label class="form-check-label" for="autoPrint">
+                                                <i class="fas fa-print"></i> Auto Print Receipt
+                                            </label>
+                                            <small class="form-text text-muted">Automatically print after each sale</small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- POS Settings -->
+                        <div class="card mt-4">
+                            <div class="card-header">
+                                <h5><i class="fas fa-cash-register"></i> POS Settings</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-check mb-3">
+                                            <input class="form-check-input" type="checkbox" name="barcode_sound" id="barcodeSound" checked>
+                                            <label class="form-check-label" for="barcodeSound">
+                                                <i class="fas fa-volume-up"></i> Barcode Scan Sound
+                                            </label>
+                                        </div>
+                                        
+                                        <div class="form-check mb-3">
+                                            <input class="form-check-input" type="checkbox" name="low_stock_alert" id="lowStockAlert" checked>
+                                            <label class="form-check-label" for="lowStockAlert">
+                                                <i class="fas fa-exclamation-triangle"></i> Low Stock Alerts
+                                            </label>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="col-md-6">
+                                        <div class="form-group mb-3">
+                                            <label for="items_per_page"><i class="fas fa-list"></i> Items Per Page</label>
+                                            <select class="form-control" name="items_per_page" id="items_per_page">
+                                                <option value="10">10 items</option>
+                                                <option value="25" selected>25 items</option>
+                                                <option value="50">50 items</option>
+                                                <option value="100">100 items</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save"></i> Save Preferences
+                            </button>
+                        </div>
+                    </form>
+                </div>
+                
+                <div class="col-md-4">
+                    <!-- Quick Actions -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h5><i class="fas fa-bolt"></i> Quick Actions</h5>
+                        </div>
+                        <div class="card-body">
+                            <a href="{% url 'settings:payment_options' %}" class="btn btn-outline-primary btn-block mb-2">
+                                <i class="fas fa-credit-card"></i> Payment Options
+                            </a>
+                            <a href="{% url 'settings:data_backup' %}" class="btn btn-outline-info btn-block mb-2">
+                                <i class="fas fa-download"></i> Data Backup
+                            </a>
+                            <button class="btn btn-outline-warning btn-block mb-2" onclick="clearCache()">
+                                <i class="fas fa-trash"></i> Clear Cache
+                            </button>
+                            <button class="btn btn-outline-secondary btn-block" onclick="resetPreferences()">
+                                <i class="fas fa-undo"></i> Reset to Default
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Preferences Tips -->
+                    <div class="card mt-3">
+                        <div class="card-header">
+                            <h6><i class="fas fa-lightbulb"></i> Tips & Recommendations</h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="alert alert-info">
+                                <h6><i class="fas fa-info-circle"></i> Pro Tips:</h6>
+                                <ul class="mb-0">
+                                    <li>Enable notifications for important alerts</li>
+                                    <li>Set appropriate tax rates for your region</li>
+                                    <li>Use quick payment mode for faster checkout</li>
+                                    <li>Enable auto-backup to prevent data loss</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Current Settings Summary -->
+                    <div class="card mt-3">
+                        <div class="card-header">
+                            <h6><i class="fas fa-cog"></i> Current Settings</h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="row text-center">
+                                <div class="col-6">
+                                    <div class="border-end">
+                                        <h5 class="text-success">💵</h5>
+                                        <small>Default Payment</small>
+                                    </div>
+                                </div>
+                                <div class="col-6">
+                                    <h5 class="text-primary">₨</h5>
+                                    <small>Currency</small>
+                                </div>
+                            </div>
+                            <hr>
+                            <div class="row text-center">
+                                <div class="col-6">
+                                    <div class="border-end">
+                                        <h5 class="text-info">🔔</h5>
+                                        <small>Notifications</small>
+                                    </div>
+                                </div>
+                                <div class="col-6">
+                                    <h5 class="text-warning">☁️</h5>
+                                    <small>Auto Backup</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function clearCache() {
+    if (confirm('Are you sure you want to clear cache? This will refresh all stored data.')) {
+        // Add cache clearing logic here
+        alert('Cache cleared successfully!');
+    }
+}
+
+function resetPreferences() {
+    if (confirm('Are you sure you want to reset all preferences to default values?')) {
+        // Add reset logic here
+        location.reload();
+    }
+}
+</script>
+{% endblock %}

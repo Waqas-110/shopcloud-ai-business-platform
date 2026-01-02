@@ -1,0 +1,445 @@
+{% extends 'dashboard_base.html' %}
+{% load static %}
+
+{% block title %}مصنوعات - ShopCloud{% endblock %}
+
+{% block dashboard_css %}
+<link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
+<style>
+.dashboard-container {
+    direction: rtl;
+}
+
+.main-content {
+    margin-left: 280px !important;
+    margin-right: 0 !important;
+    width: calc(100% - 280px) !important;
+    direction: rtl;
+}
+
+.page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+    background: #FFFFFF;
+    padding: 25px;
+    border-radius: 15px;
+    box-shadow: 0 1px 6px rgba(15, 23, 42, 0.06);
+}
+
+.page-header h1 {
+    margin: 0;
+    font-size: 1.8rem;
+    color: #1f2937;
+    font-weight: 700;
+}
+
+.btn {
+    /* global button theme from main.css; tweak size only */
+    padding: 10px 20px;
+}
+
+.search-filter-section {
+    background: #FFFFFF;
+    padding: 25px;
+    border-radius: 15px;
+    box-shadow: 0 1px 6px rgba(15, 23, 42, 0.06);
+    margin-bottom: 25px;
+}
+
+.filter-row {
+    display: flex;
+    gap: 15px;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.filter-row input,
+.filter-row select {
+    flex: 1;
+    min-width: 150px;
+    padding: 12px 16px;
+    border: 2px solid #e5e7eb;
+    border-radius: 10px;
+    font-size: 1rem;
+}
+
+.action-buttons {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-top: 15px;
+}
+
+.table-container {
+    background: white;
+    border-radius: 15px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+    overflow: hidden;
+}
+
+.products-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.products-table th {
+    background: #F9FAFB;
+    padding: 18px 15px;
+    text-align: right;
+    font-weight: 700;
+    color: #374151;
+    border-bottom: 1px solid #E0E3E7;
+    font-size: 0.9rem;
+}
+
+.products-table td {
+    padding: 18px 15px;
+    border-bottom: 1px solid #F3F4F6;
+    color: #1f2937;
+    text-align: right;
+}
+
+.products-table tr:hover {
+    background: #F9FAFB;
+}
+
+.product-image {
+    width: 50px;
+    height: 50px;
+    object-fit: cover;
+    border-radius: 8px;
+    border: 2px solid #e5e7eb;
+}
+
+.no-image {
+    width: 50px;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #F4F6F8;
+    border-radius: 8px;
+    font-size: 24px;
+}
+
+.stock-badge {
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    display: inline-block;
+}
+
+.stock-badge:not(.low-stock):not(.out-stock) {
+    background: #00C16E;
+    color: #FFFFFF;
+}
+
+.stock-badge.low-stock {
+    background: #FF9800;
+    color: #1F2937;
+}
+
+.stock-badge.out-stock {
+    background: #E53935;
+    color: #FFFFFF;
+}
+
+.profit-badge {
+    padding: 6px 12px;
+    border-radius: 20px;
+    background: #4A6CF7;
+    color: #FFFFFF;
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+.barcode {
+    background: #F4F6F8;
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-family: 'Courier New', monospace;
+    font-size: 0.85rem;
+    border: 1px solid #E0E3E7;
+    color: #1F2937;
+}
+
+.btn-edit {
+    padding: 8px 14px;
+    border-radius: 8px;
+    text-decoration: none;
+    font-size: 0.85rem;
+    margin-left: 5px;
+    background: #3b82f6;
+    color: white;
+    border: none;
+}
+
+.btn-delete {
+    padding: 8px 14px;
+    border-radius: 8px;
+    text-decoration: none;
+    font-size: 0.85rem;
+    margin-left: 5px;
+    background: #ef4444;
+    color: white;
+    border: none;
+}
+
+.btn-barcode {
+    padding: 8px 14px;
+    border-radius: 8px;
+    text-decoration: none;
+    font-size: 0.85rem;
+    margin-left: 5px;
+    background: #10b981;
+    color: white;
+    border: none;
+    cursor: pointer;
+}
+
+.btn-edit:hover {
+    background: #2563eb;
+    color: white;
+}
+
+.btn-delete:hover {
+    background: #dc2626;
+    color: white;
+}
+
+.btn-barcode:hover {
+    background: #059669;
+}
+
+.empty-state {
+    text-align: center;
+    padding: 60px 40px;
+    color: #6b7280;
+}
+
+.empty-state p {
+    font-size: 1.2rem;
+    margin-bottom: 10px;
+    font-weight: 600;
+}
+
+.empty-state small {
+    font-size: 0.95rem;
+}
+
+@media (max-width: 768px) {
+    .filter-row {
+        flex-direction: column;
+    }
+    
+    .filter-row input,
+    .filter-row select {
+        width: 100%;
+    }
+    
+    .products-table {
+        font-size: 0.85rem;
+    }
+    
+    .products-table th,
+    .products-table td {
+        padding: 12px 8px;
+    }
+    
+    .main-content {
+        margin-right: 0;
+    }
+}
+</style>
+{% endblock %}
+
+{% block dashboard_content %}
+
+        <div class="page-header">
+            <div>
+                <h1>مصنوعات کا انتظام</h1>
+                <p class="text-muted mb-0">کل مصنوعات: <strong>{{ products|length }}</strong></p>
+            </div>
+            <a href="{% url 'products:add' %}" class="btn btn-primary">+ نیا مصنوعات شامل کریں</a>
+        </div>
+
+        <!-- Search & Filter Section -->
+        <div class="search-filter-section">
+            <form method="get" class="filter-form">
+                <div class="filter-row">
+                    <input type="text" name="search" value="{{ search }}" placeholder="مصنوعات تلاش کریں..." class="form-control">
+                    
+                    <select name="category" class="form-control">
+                        <option value="">تمام اقسام</option>
+                        {% for category in categories %}
+                            <option value="{{ category.id }}" {% if category_filter == category.id|stringformat:'s' %}selected{% endif %}>
+                                {{ category.name }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                    
+                    <select name="stock" class="form-control">
+                        <option value="">تمام اسٹاک</option>
+                        <option value="low" {% if stock_filter == 'low' %}selected{% endif %}>کم اسٹاک</option>
+                        <option value="out" {% if stock_filter == 'out' %}selected{% endif %}>اسٹاک ختم</option>
+                    </select>
+                    
+                    <button type="submit" class="btn btn-primary">فلٹر</button>
+                    <a href="{% url 'products:list' %}" class="btn btn-secondary">صاف کریں</a>
+                </div>
+            </form>
+            
+            <div class="action-buttons">
+                <a href="{% url 'products:categories' %}" class="btn btn-info">اقسام کا انتظام</a>
+            </div>
+        </div>
+
+        <!-- Products Table -->
+        <div class="table-container">
+            <table class="products-table">
+                <thead>
+                    <tr>
+                        <th>تصویر</th>
+                        <th>نام</th>
+                        <th>قسم</th>
+                        <th>بارکوڈ</th>
+                        <th>یونٹ</th>
+                        <th>قیمت لاگت</th>
+                        <th>فروخت قیمت</th>
+                        <th>اسٹاک</th>
+                        <th>منافع %</th>
+                        <th>اعمال</th>
+                    </tr>
+                </thead>
+                <tbody id="productsTableBody">
+                    {% for product in products %}
+                    <tr>
+                        <td>
+                            {% if product.image %}
+                                <img src="{{ product.image.url }}" alt="{{ product.name }}" class="product-image">
+                            {% else %}
+                                <div class="no-image">📦</div>
+                            {% endif %}
+                        </td>
+                        <td>{{ product.name }}</td>
+                        <td>{{ product.category.name|default:"کوئی قسم نہیں" }}</td>
+                        <td>
+                            {% if product.barcode %}
+                                <code class="barcode">{{ product.barcode }}</code>
+                            {% else %}
+                                <span class="text-muted">بارکوڈ نہیں</span>
+                            {% endif %}
+                        </td>
+                        <td>{{ product.get_unit_display }}</td>
+                        <td>Rs. {{ product.cost_price }}</td>
+                        <td>Rs. {{ product.sale_price }}</td>
+                        <td>
+                            <span class="stock-badge {% if product.is_low_stock %}low-stock{% elif product.stock == 0 %}out-stock{% endif %}">
+                                {{ product.stock }}
+                            </span>
+                        </td>
+                        <td>
+                            <span class="profit-badge">{{ product.profit_margin|floatformat:1 }}%</span>
+                        </td>
+                        <td>
+                            <a href="{% url 'products:edit' product.id %}" class="btn-edit">ترمیم</a>
+                            <button class="btn-barcode" onclick="generateBarcode({{ product.id }})">🏷️</button>
+                            <a href="{% url 'products:delete' product.id %}" class="btn-delete" onclick="return confirm('کیا آپ یقینی ہیں؟')">حذف</a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="10" class="no-products">
+                            <div class="empty-state">
+                                <p>📦 کوئی مصنوعات نہیں ملی</p>
+                                <small>شروع کرنے کے لیے اپنی پہلی مصنوعات شامل کریں!</small>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+<!-- Low Stock Alert Modal -->
+<div class="modal fade" id="lowStockModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">کم اسٹاک الرٹ</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" id="lowStockContent">
+                <div class="text-center">
+                    <div class="spinner-border" role="status">
+                        <span class="visually-hidden">لوڈ ہو رہا ہے...</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Generate barcode function
+function generateBarcode(productId) {
+    if (confirm('اس مصنوعات کے لیے نیا بارکوڈ بنائیں؟')) {
+        fetch('{% url "products:generate_barcode" %}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+            },
+            body: `product_id=${productId}`
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert(`نیا بارکوڈ بنایا گیا: ${data.barcode}`);
+                location.reload();
+            } else {
+                alert('بارکوڈ بنانے میں خرابی');
+            }
+        });
+    }
+}
+
+// Show low stock alert
+function showLowStockAlert() {
+    const modal = new bootstrap.Modal(document.getElementById('lowStockModal'));
+    modal.show();
+    
+    fetch('{% url "products:low_stock_alert" %}')
+        .then(response => response.json())
+        .then(data => {
+            const content = document.getElementById('lowStockContent');
+            if (data.count === 0) {
+                content.innerHTML = '<div class="text-center"><h5>✅ تمام مصنوعات کا اسٹاک کافی ہے!</h5></div>';
+            } else {
+                let html = `<div class="alert alert-warning"><strong>${data.count} مصنوعات کا اسٹاک کم ہے:</strong></div>`;
+                html += '<div class="table-responsive"><table class="table table-sm">';
+                html += '<thead><tr><th>مصنوعات</th><th>قسم</th><th>موجودہ اسٹاک</th><th>کم اسٹاک</th></tr></thead><tbody>';
+                
+                data.products.forEach(product => {
+                    html += `<tr>
+                        <td>${product.name}</td>
+                        <td>${product.category}</td>
+                        <td><span class="badge bg-warning">${product.stock}</span></td>
+                        <td>${product.min_stock}</td>
+                    </tr>`;
+                });
+                
+                html += '</tbody></table></div>';
+                content.innerHTML = html;
+            }
+        })
+        .catch(error => {
+            document.getElementById('lowStockContent').innerHTML = '<div class="alert alert-danger">کم اسٹاک ڈیٹا لوڈ کرنے میں خرابی</div>';
+        });
+}
+</script>
+{% endblock %}
+

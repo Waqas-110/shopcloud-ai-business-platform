@@ -1,0 +1,222 @@
+{% extends 'dashboard_base.html' %}
+{% load static %}
+
+{% block title %}POS - ShopCloud{% endblock %}
+
+{% block dashboard_css %}
+<link rel="stylesheet" href="{% static 'css/pos.css' %}">
+{% endblock %}
+
+{% block dashboard_content %}
+<div class="pos-container">
+    <!-- Main Section -->
+    <div class="main-section">
+        <!-- Search Section -->
+        <div class="search-section">
+            <h3>🛒 Point of Sale - {{ user.shop.name }}</h3>
+            
+            <div class="search-row">
+                <input type="text" class="search-input" id="productSearch" placeholder="🔍 Type product name or barcode - Click to add" autocomplete="off" autofocus>
+                <button class="scan-btn" onclick="startBarcodeScanner()">📷 Scan</button>
+            </div>
+            
+            <div class="search-results" id="searchResults"></div>
+        </div>
+
+        <!-- Cart Section -->
+        <div class="cart-section">
+            <div class="cart-header">🛒 Shopping Cart</div>
+            <div class="cart-items" id="cartItems">
+                <div class="empty-cart">
+                    <p>Cart is empty</p>
+                    <small>Search and add products to get started</small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bill Section -->
+    <div class="bill-section">
+        <div class="bill-section-header">💳 Billing</div>
+        
+        <!-- Customer Section -->
+        <div class="customer-section">
+            <div class="customer-header">Customer Details</div>
+            <input type="text" class="customer-input" id="customerPhone" placeholder="Enter phone number">
+            <input type="text" class="customer-input" id="customerName" placeholder="Customer name">
+            <input type="email" class="customer-input" id="customerEmail" placeholder="Email (optional)">
+        </div>
+        
+        <!-- Totals -->
+        <div class="totals-section" id="totalsSection" style="display: none;">
+            <div class="total-row">
+                <span>Subtotal:</span>
+                <span id="subtotal">Rs. 0.00</span>
+            </div>
+            <div class="total-row final">
+                <span>Total:</span>
+                <span id="total">Rs. 0.00</span>
+            </div>
+        </div>
+
+        <!-- Payment Method -->
+        <div class="payment-section">
+            <h4>Payment Method</h4>
+            <div class="payment-methods">
+                <button class="payment-btn active" data-method="cash">Cash</button>
+                <button class="payment-btn" data-method="card">Card</button>
+            </div>
+        </div>
+
+        <!-- Actions -->
+        <div class="action-buttons">
+            <button class="checkout-btn" onclick="checkout()" id="checkoutBtn" disabled>Complete Sale - Rs. 0.00</button>
+            <button class="clear-cart-btn" onclick="clearCart()" id="clearBtn" style="display: none;">Clear Cart</button>
+        </div>
+    </div>
+</div>
+
+<script>
+let cart = {};
+let selectedPaymentMethod = 'cash';
+
+function searchProducts(query) {
+    fetch('/billing/search-products/?q=' + encodeURIComponent(query))
+        .then(response => response.json())
+        .then(data => {
+            displaySearchResults(data.products || []);
+        });
+}
+
+function displaySearchResults(products) {
+    const resultsDiv = document.getElementById('searchResults');
+    resultsDiv.innerHTML = '';
+    
+    products.forEach(product => {
+        const item = document.createElement('div');
+        item.className = 'result-item';
+        item.onclick = () => addProductToCart(product);
+        item.innerHTML = '<div>' + product.name + '</div><div>Rs. ' + product.price + '</div>';
+        resultsDiv.appendChild(item);
+    });
+    
+    resultsDiv.style.display = products.length > 0 ? 'block' : 'none';
+}
+
+function addProductToCart(product) {
+    fetch('/billing/add-to-cart/', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+        },
+        body: JSON.stringify({
+            product_id: product.id,
+            quantity: 1
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            cart = data.cart;
+            updateCartDisplay();
+        }
+    });
+}
+
+function updateCartDisplay() {
+    const cartItems = document.getElementById('cartItems');
+    
+    if (Object.keys(cart).length === 0) {
+        cartItems.innerHTML = '<div class="empty-cart"><p>Cart is empty</p></div>';
+        return;
+    }
+    
+    let html = '';
+    let subtotal = 0;
+    
+    Object.entries(cart).forEach(([productId, item]) => {
+        const itemTotal = item.price * item.quantity;
+        subtotal += itemTotal;
+        
+        html += '<div class="cart-item">';
+        html += '<div>' + item.name + '</div>';
+        html += '<div>Rs. ' + itemTotal.toFixed(2) + '</div>';
+        html += '</div>';
+    });
+    
+    cartItems.innerHTML = html;
+    
+    document.getElementById('subtotal').textContent = 'Rs. ' + subtotal.toFixed(2);
+    document.getElementById('total').textContent = 'Rs. ' + subtotal.toFixed(2);
+    document.getElementById('totalsSection').style.display = 'block';
+    document.getElementById('checkoutBtn').disabled = false;
+    document.getElementById('clearBtn').style.display = 'block';
+}
+
+function clearCart() {
+    fetch('/billing/clear-cart/', {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+        }
+    })
+    .then(() => {
+        cart = {};
+        updateCartDisplay();
+    });
+}
+
+function checkout() {
+    const total = parseFloat(document.getElementById('total').textContent.replace('Rs. ', ''));
+    
+    fetch('/billing/create-bill/', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+        },
+        body: JSON.stringify({
+            customer_name: document.getElementById('customerName').value,
+            customer_phone: document.getElementById('customerPhone').value,
+            payment_type: selectedPaymentMethod,
+            total: total
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert('Bill created successfully!');
+            cart = {};
+            updateCartDisplay();
+        }
+    });
+}
+
+function startBarcodeScanner() {
+    const barcode = prompt('Enter barcode:');
+    if (barcode) {
+        searchProducts(barcode);
+    }
+}
+
+// Search input handler
+document.getElementById('productSearch').addEventListener('input', function() {
+    const query = this.value.trim();
+    if (query.length >= 1) {
+        searchProducts(query);
+    }
+});
+
+// Payment method selection
+document.querySelectorAll('.payment-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+        document.querySelectorAll('.payment-btn').forEach(b => b.classList.remove('active'));
+        this.classList.add('active');
+        selectedPaymentMethod = this.dataset.method;
+    });
+});
+</script>
+
+{% csrf_token %}
+{% endblock %}

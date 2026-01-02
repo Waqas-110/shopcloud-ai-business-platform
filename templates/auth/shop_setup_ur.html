@@ -1,0 +1,329 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}شاپ سیٹ اپ - ShopCloud{% endblock %}
+
+{% block extra_css %}
+<style>
+.setup-hero {
+    background: linear-gradient(135deg, #F4F6F8 0%, #E6ECFF 100%);
+    color: #1A202C;
+    padding: 60px 20px;
+    text-align: center;
+}
+
+.setup-hero h1 {
+    font-size: 2.3rem;
+    font-weight: 800;
+    margin-bottom: 10px;
+}
+
+.setup-hero p {
+    font-size: 1.05rem;
+    opacity: 0.85;
+}
+
+.setup-container {
+    max-width: 900px;
+    margin: -40px auto 60px;
+    padding: 0 20px;
+    position: relative;
+    z-index: 10;
+}
+
+.setup-card {
+    background: white;
+    border-radius: 20px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+}
+
+.setup-left {
+    background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+    color: white;
+    padding: 50px 40px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    text-align: center;
+}
+
+.setup-left img {
+    width: 120px;
+    height: 120px;
+    margin: 0 auto 30px;
+    opacity: 0.9;
+}
+
+.setup-left h2 {
+    font-size: 2rem;
+    margin-bottom: 20px;
+    font-weight: 700;
+}
+
+.setup-left p {
+    font-size: 1.1rem;
+    opacity: 0.95;
+    line-height: 1.8;
+    margin-bottom: 30px;
+}
+
+.features-list {
+    list-style: none;
+    padding: 0;
+    margin: 30px 0;
+    text-align: left;
+}
+
+.features-list li {
+    padding: 10px 0;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 1rem;
+}
+
+.features-list li .icon {
+    font-size: 1.3rem;
+    width: 25px;
+}
+
+.setup-right {
+    padding: 50px 40px;
+}
+
+.setup-right h3 {
+    font-size: 1.8rem;
+    margin-bottom: 10px;
+    color: #1f2937;
+    font-weight: 700;
+}
+
+.setup-right p {
+    color: #6b7280;
+    margin-bottom: 30px;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-label {
+    display: block;
+    font-weight: 600;
+    color: #374151;
+    margin-bottom: 8px;
+    font-size: 0.95rem;
+}
+
+.form-control {
+    width: 100%;
+    padding: 12px 16px;
+    border: 1px solid #E0E3E7;
+    border-radius: 10px;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    background: #f9fafb;
+}
+
+.form-control:focus {
+    outline: none;
+    border-color: #4A6CF7;
+    background: #FFFFFF;
+    box-shadow: 0 0 0 0.12rem rgba(74, 108, 247, 0.25);
+}
+
+textarea.form-control {
+    resize: vertical;
+    min-height: 100px;
+}
+
+input[type="file"].form-control {
+    padding: 8px;
+    cursor: pointer;
+}
+
+.file-preview {
+    margin-top: 10px;
+    padding: 10px;
+    background: #f3f4f6;
+    border-radius: 8px;
+    display: none;
+}
+
+.file-preview img {
+    max-width: 100px;
+    max-height: 100px;
+    border-radius: 8px;
+}
+
+.btn-submit {
+    width: 100%;
+    padding: 14px;
+    background: #00C16E;
+    color: #FFFFFF;
+    border: none;
+    border-radius: 10px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-top: 10px;
+}
+
+.btn-submit:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 18px rgba(0, 193, 110, 0.35);
+}
+
+.alert {
+    padding: 12px 16px;
+    border-radius: 10px;
+    margin-bottom: 20px;
+    font-size: 0.95rem;
+}
+
+.alert-success {
+    background: #d1fae5;
+    color: #065f46;
+    border: 1px solid #a7f3d0;
+}
+
+.alert-error {
+    background: #fee2e2;
+    color: #991b1b;
+    border: 1px solid #fecaca;
+}
+
+.optional-badge {
+    font-size: 0.75rem;
+    color: #6b7280;
+    font-weight: normal;
+    margin-left: 5px;
+}
+
+@media (max-width: 768px) {
+    .setup-card {
+        grid-template-columns: 1fr;
+    }
+    
+    .setup-left {
+        padding: 40px 30px;
+    }
+    
+    .setup-right {
+        padding: 40px 30px;
+    }
+    
+    .setup-hero h1 {
+        font-size: 2rem;
+    }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<section class="setup-hero">
+    <div class="container">
+        <h1>اپنی شاپ سیٹ اپ کریں</h1>
+        <p>ShopCloud کے ساتھ شروع کرنے کے لیے اپنی شاپ کی معلومات مکمل کریں</p>
+    </div>
+</section>
+
+<div class="setup-container">
+    <div class="setup-card">
+        <div class="setup-left">
+            <img src="{% static 'images/logo-icon.svg' %}" alt="ShopCloud">
+            <h2>ShopCloud</h2>
+            <p>اپنی شاپ کو مؤثر طریقے سے منظم کرنے کے لیے آپ کا مکمل POS حل</p>
+            <ul class="features-list">
+                <li>
+                    <span class="icon">🏪</span>
+                    <span>اپنی شاپ منظم کریں</span>
+                </li>
+                <li>
+                    <span class="icon">📊</span>
+                    <span>سیلز اور منافع ٹریک کریں</span>
+                </li>
+                <li>
+                    <span class="icon">📦</span>
+                    <span>انوینٹری مینجمنٹ</span>
+                </li>
+                <li>
+                    <span class="icon">🛒</span>
+                    <span>تیز بلنگ سسٹم</span>
+                </li>
+            </ul>
+        </div>
+        
+        <div class="setup-right">
+            <h3>شاپ کی معلومات</h3>
+            <p>سیٹ اپ مکمل کرنے کے لیے اپنی شاپ کی تفصیلات درج کریں</p>
+            
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+            
+            <form method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                
+                <div class="form-group">
+                    <label for="shop_name" class="form-label">شاپ کا نام <span style="color: #ef4444;">*</span></label>
+                    <input type="text" class="form-control" id="shop_name" name="shop_name" required placeholder="اپنے شاپ کا نام درج کریں">
+                </div>
+                
+                <div class="form-group">
+                    <label for="address" class="form-label">پتہ <span style="color: #ef4444;">*</span></label>
+                    <textarea class="form-control" id="address" name="address" rows="3" required placeholder="اپنا شاپ کا پتہ درج کریں"></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label for="whatsapp" class="form-label">واٹس ایپ نمبر <span style="color: #ef4444;">*</span></label>
+                    <input type="text" class="form-control" id="whatsapp" name="whatsapp" required placeholder="03001234567">
+                    <small style="color: #6b7280; font-size: 0.85rem;">ملکی کوڈ شامل کریں (مثال: 03001234567)</small>
+                </div>
+                
+                <div class="form-group">
+                    <label for="email" class="form-label">شاپ ای میل <span class="optional-badge">(اختیاری)</span></label>
+                    <input type="email" class="form-control" id="email" name="email" placeholder="shop@example.com">
+                </div>
+                
+                <div class="form-group">
+                    <label for="logo" class="form-label">شاپ لوگو <span class="optional-badge">(اختیاری)</span></label>
+                    <input type="file" class="form-control" id="logo" name="logo" accept="image/*" onchange="previewImage(this)">
+                    <div class="file-preview" id="logoPreview">
+                        <img id="previewImg" src="" alt="لوگو پیش منظر">
+                    </div>
+                </div>
+                
+                <button type="submit" class="btn-submit">سیٹ اپ مکمل کریں</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+function previewImage(input) {
+    const preview = document.getElementById('logoPreview');
+    const img = document.getElementById('previewImg');
+    
+    if (input.files && input.files[0]) {
+        const reader = new FileReader();
+        
+        reader.onload = function(e) {
+            img.src = e.target.result;
+            preview.style.display = 'block';
+        }
+        
+        reader.readAsDataURL(input.files[0]);
+    } else {
+        preview.style.display = 'none';
+    }
+}
+</script>
+{% endblock %}
+

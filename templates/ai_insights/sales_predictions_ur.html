@@ -1,0 +1,216 @@
+{% extends 'dashboard_base.html' %}
+{% load static %}
+
+{% block title %}فروخت کی پیشن گوئی - {{ shop.name }}{% endblock %}
+
+{% block extra_css %}
+<style>
+    body {
+        font-family: 'Noto Nastaliq Urdu', Arial, sans-serif;
+        direction: rtl;
+    }
+    
+    .card {
+        border-right: 4px solid transparent;
+        transform: translateX(-5px);
+    }
+    
+    .text-right {
+        text-align: left;
+    }
+    
+    .text-left {
+        text-align: right;
+    }
+    
+    .ml-2 {
+        margin-right: 0.5rem !important;
+        margin-left: 0 !important;
+    }
+    
+    .d-flex {
+        flex-direction: row-reverse;
+    }
+    
+    .justify-content-between {
+        justify-content: space-between;
+    }
+    
+    .alert {
+        text-align: right;
+    }
+</style>
+{% endblock %}
+
+{% block dashboard_content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2><i class="fas fa-chart-line text-primary"></i> فروخت کی پیشن گوئی</h2>
+                <a href="{% url 'ai_insights:dashboard' %}" class="btn btn-outline-secondary">
+                    <i class="fas fa-arrow-right"></i> ڈیش بورڈ پر واپس
+                </a>
+            </div>
+        </div>
+    </div>
+
+    {% if predictions %}
+    <div class="row">
+        <!-- Chart Section -->
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-header">
+                    <h5><i class="fas fa-chart-area"></i> 7 دن کی فروخت کی پیشن گوئی</h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="salesChart" height="100"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Predictions List -->
+        <div class="col-lg-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5><i class="fas fa-list"></i> روزانہ پیشن گوئیاں</h5>
+                </div>
+                <div class="card-body">
+                    {% for prediction in predictions %}
+                    <div class="d-flex justify-content-between align-items-center mb-3 p-2 border rounded">
+                        <div>
+                            <strong>{{ prediction.date|date:"l, M d" }}</strong>
+                            <div class="progress mt-1" style="height: 5px;">
+                                <div class="progress-bar bg-success" style="width: {{ prediction.confidence|floatformat:0 }}%"></div>
+                            </div>
+                            <small class="text-muted">{{ prediction.confidence|floatformat:0 }}% اعتماد</small>
+                        </div>
+                        <div class="text-right">
+                            <h5 class="text-success mb-0">₨{{ prediction.predicted_sales|floatformat:0 }}</h5>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <!-- Summary Stats -->
+            <div class="card mt-3">
+                <div class="card-header">
+                    <h6><i class="fas fa-calculator"></i> ہفتے کا خلاصہ</h6>
+                </div>
+                <div class="card-body">
+                    {% with total_predicted=predictions|length %}
+                    <div class="row text-center">
+                        <div class="col-6">
+                            <h4 class="text-primary">{{ total_predicted }}</h4>
+                            <small class="text-muted">دن</small>
+                        </div>
+                        <div class="col-6">
+                            <h4 class="text-success">₨{% widthratio predictions.0.predicted_sales 1 7 %}</h4>
+                            <small class="text-muted">ہفتے کا تخمینی کل</small>
+                        </div>
+                    </div>
+                    {% endwith %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Insights & Tips -->
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5><i class="fas fa-lightbulb"></i> AI بصیرت</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="alert alert-info">
+                                <h6><i class="fas fa-calendar-week"></i> بہترین دن</h6>
+                                <p class="mb-0">ہفتے کے آخر میں فروخت عام طور پر 30% بڑھ جاتی ہے۔ اس کے مطابق انوینٹری کی منصوبہ بندی کریں۔</p>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="alert alert-success">
+                                <h6><i class="fas fa-trending-up"></i> ترقی کا رجحان</h6>
+                                <p class="mb-0">آپ کی فروخت مستقل ترقی ظاہر کر رہی ہے۔ مقبول کیٹگریز کو بڑھانے پر غور کریں۔</p>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="alert alert-warning">
+                                <h6><i class="fas fa-exclamation-triangle"></i> سفارش</h6>
+                                <p class="mb-0">زیادہ فروخت والے دنوں سے پہلے تیزی سے بکنے والے آئٹمز کا اسٹاک کریں۔</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {% else %}
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body text-center py-5">
+                    <i class="fas fa-chart-line fa-4x text-muted mb-4"></i>
+                    <h4>کوئی پیشن گوئی دستیاب نہیں</h4>
+                    <p class="text-muted">AI کو درست پیشن گوئیاں بنانے کے لیے مزید فروخت کے ڈیٹا کی ضرورت ہے۔ فروخت جاری رکھیں اور جلد دوبارہ چیک کریں!</p>
+                    <a href="{% url 'billing:pos' %}" class="btn btn-primary">
+                        <i class="fas fa-cash-register"></i> فروخت کریں
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+{% if predictions %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+const ctx = document.getElementById('salesChart').getContext('2d');
+const salesChart = new Chart(ctx, {
+    type: 'line',
+    data: {
+        labels: [
+            {% for prediction in predictions %}
+            '{{ prediction.date|date:"M d" }}'{% if not forloop.last %},{% endif %}
+            {% endfor %}
+        ],
+        datasets: [{
+            label: 'متوقع فروخت (₨)',
+            data: [
+                {% for prediction in predictions %}
+                {{ prediction.predicted_sales }}{% if not forloop.last %},{% endif %}
+                {% endfor %}
+            ],
+            borderColor: 'rgb(75, 192, 192)',
+            backgroundColor: 'rgba(75, 192, 192, 0.1)',
+            tension: 0.4,
+            fill: true
+        }]
+    },
+    options: {
+        responsive: true,
+        plugins: {
+            legend: {
+                display: false
+            }
+        },
+        scales: {
+            y: {
+                beginAtZero: true,
+                ticks: {
+                    callback: function(value) {
+                        return '₨' + value.toLocaleString();
+                    }
+                }
+            }
+        }
+    }
+});
+</script>
+{% endif %}
+{% endblock %}

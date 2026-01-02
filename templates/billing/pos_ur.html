@@ -1,0 +1,1110 @@
+{% extends 'dashboard_base.html' %}
+{% load static %}
+
+{% block title %}POS - ShopCloud{% endblock %}
+
+{% block dashboard_css %}
+<link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
+<style>
+.dashboard-container {
+    display: flex;
+    min-height: calc(100vh - 70px);
+    background: #F4F6F8;
+    direction: rtl;
+}
+
+.main-content {
+    flex: 1;
+    margin-right: 250px;
+    padding: 0;
+    transition: margin-right 0.3s ease;
+}
+
+.main-content.expanded {
+    margin-right: 0;
+}
+
+.pos-container {
+    display: flex;
+    height: calc(100vh - 70px);
+}
+
+.main-section {
+    flex: 2;
+    background: #FFFFFF;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+}
+
+.bill-section {
+    flex: 1;
+    background: #F9FAFB;
+    padding: 20px;
+    border-right: 1px solid #E0E3E7;
+    display: flex;
+    flex-direction: column;
+}
+
+.search-section {
+    margin-bottom: 20px;
+    position: relative;
+}
+
+.search-row {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 15px;
+}
+
+.search-input {
+    flex: 1;
+    padding: 15px 20px;
+    border: 1px solid #4A6CF7;
+    border-radius: 12px;
+    font-size: 16px;
+    outline: none;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 8px rgba(74,108,247,0.12);
+}
+
+.search-input:focus {
+    border-color: #3B5AE0;
+    box-shadow: 0 4px 12px rgba(74,108,247,0.25);
+    transform: translateY(-1px);
+}
+
+.search-input::placeholder {
+    color: #6c757d;
+    font-style: italic;
+}
+
+.scan-btn {
+    padding: 10px 20px;
+    background: #00C16E;
+    color: #FFFFFF;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 6px rgba(0,193,110,0.35);
+    min-width: 120px;
+}
+
+.scan-btn:hover {
+    background: #00a85f;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(40,167,69,0.4);
+}
+
+.scan-btn:active {
+    transform: translateY(0);
+}
+
+
+
+.search-results {
+    max-height: 300px;
+    overflow-y: auto;
+    border: 1px solid #E0E3E7;
+    border-radius: 8px;
+    background: white;
+    display: none;
+    box-shadow: 0 8px 20px rgba(15,23,42,0.1);
+    position: absolute;
+    z-index: 1000;
+    margin-top: 5px;
+    width: calc(100% - 140px);
+}
+
+.result-item {
+    padding: 15px;
+    border-bottom: 1px solid #f0f0f0;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: all 0.2s ease;
+    position: relative;
+}
+
+.result-item:hover:not([style*="cursor: not-allowed"]) {
+    background: #EEF2FF;
+    transform: translateX(-3px);
+    border-right: 3px solid #4A6CF7;
+}
+
+.result-item.highlighted {
+    background: #E0E7FF;
+    border-right: 3px solid #4A6CF7;
+}
+
+.result-item:last-child {
+    border-bottom: none;
+}
+
+.result-name {
+    font-weight: 600;
+    font-size: 14px;
+    color: #333;
+    margin-bottom: 2px;
+}
+
+.result-price {
+    color: #00C16E;
+    font-weight: bold;
+    font-size: 16px;
+    min-width: 80px;
+    text-align: left;
+}
+
+.result-stock {
+    font-size: 11px;
+    font-weight: 500;
+    margin-top: 2px;
+}
+
+.cart-section {
+    background: #FFFFFF;
+    border: 1px solid #E0E3E7;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.cart-header {
+    background: #4A6CF7;
+    color: #FFFFFF;
+    padding: 15px;
+    font-weight: bold;
+    text-align: center;
+    border-radius: 8px 8px 0 0;
+}
+
+.cart-items {
+    flex: 1;
+    overflow-y: auto;
+    padding: 10px;
+}
+
+.cart-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px;
+    border-bottom: 1px solid #EDF2F7;
+    background: #F9FAFB;
+    margin-bottom: 5px;
+    border-radius: 4px;
+}
+
+.item-info {
+    flex: 1;
+}
+
+.item-name {
+    font-weight: 600;
+    font-size: 14px;
+    margin-bottom: 2px;
+}
+
+.item-price {
+    color: #6B7280;
+    font-size: 12px;
+}
+
+.item-controls {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.qty-btn {
+    width: 30px;
+    height: 30px;
+    border: 1px solid #E0E3E7;
+    background: #FFFFFF;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.cart-qty-input {
+    width: 50px;
+    text-align: center;
+    border: 1px solid #E0E3E7;
+    border-radius: 4px;
+    padding: 5px;
+}
+
+.remove-btn {
+    color: #dc3545;
+    cursor: pointer;
+    font-size: 18px;
+    font-weight: bold;
+}
+
+.empty-cart {
+    text-align: center;
+    color: #6c757d;
+    padding: 40px 20px;
+}
+
+.totals-section {
+    background: #F3F4F6;
+    padding: 10px;
+    border-radius: 4px;
+    margin-bottom: 15px;
+}
+
+.total-row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 5px;
+    font-size: 12px;
+}
+
+.total-row.final {
+    font-weight: bold;
+    font-size: 14px;
+    border-top: 1px solid #E0E3E7;
+    padding-top: 5px;
+    margin-top: 5px;
+}
+
+.bill-section-header {
+    background: #4A6CF7;
+    color: #FFFFFF;
+    padding: 15px;
+    margin: -20px -20px 20px -20px;
+    text-align: center;
+    font-weight: bold;
+    font-size: 18px;
+}
+
+.customer-section {
+    background: #FFFFFF;
+    border: 1px solid #E0E3E7;
+    border-radius: 8px;
+    padding: 15px;
+    margin-bottom: 20px;
+}
+
+.customer-header {
+    font-weight: bold;
+    margin-bottom: 10px;
+    color: #495057;
+}
+
+.customer-input {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #E0E3E7;
+    border-radius: 4px;
+    margin-bottom: 10px;
+    font-size: 14px;
+}
+
+.customer-suggestions {
+    max-height: 150px;
+    overflow-y: auto;
+    border: 1px solid #E0E3E7;
+    border-radius: 4px;
+    background: white;
+    display: none;
+    position: absolute;
+    width: calc(100% - 30px);
+    z-index: 1000;
+}
+
+.customer-suggestion {
+    padding: 10px;
+    border-bottom: 1px solid #eee;
+    cursor: pointer;
+}
+
+.customer-suggestion:hover {
+    background: #f8f9fa;
+}
+
+.customer-suggestion:last-child {
+    border-bottom: none;
+}
+
+.suggestion-name {
+    font-weight: 600;
+}
+
+.suggestion-phone {
+    font-size: 12px;
+    color: #6c757d;
+}
+
+.suggestion-email {
+    font-size: 12px;
+    color: #007bff;
+}
+
+.payment-section {
+    margin-bottom: 15px;
+}
+
+.payment-methods {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 5px;
+    margin-bottom: 10px;
+}
+
+.payment-btn {
+    padding: 8px;
+    border: 1px solid #E0E3E7;
+    background: #FFFFFF;
+    border-radius: 3px;
+    cursor: pointer;
+    font-size: 11px;
+}
+
+.payment-btn.active {
+    background: #4A6CF7;
+    color: #FFFFFF;
+    border-color: #4A6CF7;
+}
+
+.action-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.checkout-btn {
+    width: 100%;
+    padding: 12px;
+    background: #00C16E;
+    color: #FFFFFF;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 8px rgba(0,193,110,0.3);
+}
+
+.checkout-btn:disabled {
+    background: #CBD5F5;
+    cursor: not-allowed;
+    box-shadow: none;
+}
+
+.clear-cart-btn {
+    width: 100%;
+    padding: 8px;
+    background: #E53935;
+    color: #FFFFFF;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 12px;
+}
+
+.empty-cart {
+    text-align: center;
+    color: #7f8c8d;
+    padding: 20px;
+    font-size: 12px;
+}
+</style>
+{% endblock %}
+
+{% block dashboard_content %}
+<div class="dashboard-container">
+    <!-- Sidebar -->
+    <nav class="sidebar" id="dashboardSidebar">
+        <div class="sidebar-header">
+            <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 10px; justify-content: space-between;">
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    <img src="{% static 'images/logo-icon.svg' %}" alt="ShopCloud" style="height: 32px; width: auto; filter: brightness(0) invert(1);">
+                    <h3 style="margin: 0; font-size: 18px;">ShopCloud</h3>
+                </div>
+                <button class="sidebar-toggle" onclick="toggleSidebar()" title="سائیڈبار چھپائیں/دکھائیں">
+                    <span id="sidebarToggleIcon">»</span>
+                </button>
+            </div>
+            <h4>{{ user.shop.name }}</h4>
+            <p>خوش آمدید، {{ user.first_name }}!</p>
+        </div>
+        <ul class="sidebar-menu">
+            <li><a href="{% url 'dashboard:main' %}"><i>📊</i> ڈیش بورڈ</a></li>
+            <li><a href="{% url 'products:list' %}"><i>📦</i> مصنوعات</a></li>
+            <li><a href="{% url 'products:categories' %}"><i>🏷️</i> اقسام</a></li>
+            <li><a href="{% url 'billing:pos' %}" class="active"><i>🛒</i> POS/بلنگ</a></li>
+            <li><a href="{% url 'billing:bills_list' %}"><i>📋</i> بلز کی تاریخ</a></li>
+            <li><a href="{% url 'reports:dashboard' %}"><i>📈</i> رپورٹس</a></li>
+            <li><a href="{% url 'ai_insights:dashboard' %}"><i>🤖</i> AI بصیرت</a></li>
+            <li><a href="{% url 'users:profile' %}"><i>⚙️</i> ترتیبات</a></li>
+            {% if user.is_superuser %}
+            <li><a href="{% url 'users:admin_accounts' %}"><i>🔐</i> ایڈمن پینل</a></li>
+            {% endif %}
+            <li><a href="{% url 'users:logout' %}"><i>🚪</i> لاگ آؤٹ</a></li>
+        </ul>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="pos-container">
+            <!-- Main Section -->
+            <div class="main-section">
+        <!-- Search Section -->
+        <div class="search-section">
+            <h3 style="margin: 0 0 15px 0; color: #495057;">🛒 پوائنٹ آف سیل - {{ user.shop.name }}</h3>
+            
+            <div class="search-row">
+                <input type="text" class="search-input" id="productSearch" placeholder="🔍 پروڈکٹ کا نام یا بارکوڈ ٹائپ کریں - کلک کر کے شامل کریں" autocomplete="off" autofocus>
+                <button class="scan-btn" onclick="startBarcodeScanner()" title="کیمرے سے بارکوڈ اسکین کریں">
+                    📷 اسکین
+                </button>
+            </div>
+            <div class="search-hint" style="font-size: 12px; color: #6c757d; margin-top: 5px;">
+                ✨ 1-2 حروف ٹائپ کریں → پروڈکٹ منتخب کریں → خودکار طور پر کارٹ میں شامل
+            </div>
+            
+            <div class="search-results" id="searchResults"></div>
+        </div>
+
+        <!-- Cart Section -->
+        <div class="cart-section">
+            <div class="cart-header">
+                🛒 شاپنگ کارٹ
+            </div>
+            <div class="cart-items" id="cartItems">
+                <div class="empty-cart">
+                    <p>کارٹ خالی ہے</p>
+                    <small>شروع کرنے کے لیے پروڈکٹس تلاش کر کے شامل کریں</small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bill Section -->
+    <div class="bill-section">
+        <div class="bill-section-header">
+            💳 بلنگ
+        </div>
+        
+        <!-- Customer Section -->
+        <div class="customer-section">
+            <div class="customer-header">کسٹمر کی تفصیلات</div>
+            <div style="position: relative;">
+                <input type="text" class="customer-input" id="customerPhone" placeholder="فون نمبر داخل کریں" oninput="searchCustomer(this.value)">
+                <div class="customer-suggestions" id="customerSuggestions"></div>
+            </div>
+            <input type="text" class="customer-input" id="customerName" placeholder="کسٹمر کا نام">
+            <input type="email" class="customer-input" id="customerEmail" placeholder="ای میل (اختیاری)">
+        </div>
+        
+        <!-- Cart Items -->
+        <div class="cart-section">
+            <div id="cartItems">
+                <div class="empty-cart">
+                    <p>🛒 کارٹ خالی ہے</p>
+                    <small>بلنگ شروع کرنے کے لیے پروڈکٹس شامل کریں</small>
+                </div>
+            </div>
+        </div>
+
+        <!-- Totals -->
+        <div class="totals-section" id="totalsSection" style="display: none;">
+            <div class="total-row">
+                <span>ذیلی کل:</span>
+                <span id="subtotal">Rs. 0.00</span>
+            </div>
+            <div class="total-row">
+                <span>ٹیکس (0%):</span>
+                <span id="tax">Rs. 0.00</span>
+            </div>
+            <div class="total-row">
+                <span>رعایت:</span>
+                <span id="discount">Rs. 0.00</span>
+            </div>
+            <div class="total-row final">
+                <span>کل:</span>
+                <span id="total">Rs. 0.00</span>
+            </div>
+        </div>
+
+        <!-- Payment Method -->
+        <div class="payment-section">
+            <h4>ادائیگی کا طریقہ</h4>
+            <div class="payment-methods">
+                <button class="payment-btn active" data-method="cash">نقد</button>
+                <button class="payment-btn" data-method="card">کارڈ</button>
+                <button class="payment-btn" data-method="online">آن لائن</button>
+                <button class="payment-btn" data-method="udhaar">ادھار</button>
+            </div>
+        </div>
+
+        <!-- Actions -->
+        <div class="action-buttons">
+            <button class="checkout-btn" onclick="checkout()" id="checkoutBtn" disabled>فروخت مکمل کریں - Rs. 0.00</button>
+            <button class="clear-cart-btn" onclick="clearCart()" id="clearBtn" style="display: none;">کارٹ صاف کریں</button>
+            </div>
+        </div><script>
+let cart = {};
+let selectedPaymentMethod = 'cash';
+let selectedProduct = null;
+
+// Search products
+document.getElementById('productSearch').addEventListener('input', function() {
+    const query = this.value.trim();
+    if (query.length >= 1) {
+        searchProducts(query);
+    } else {
+        hideSearchResults();
+    }
+});
+
+// Hide results when clicking outside
+document.addEventListener('click', function(e) {
+    if (!e.target.closest('.search-section')) {
+        hideSearchResults();
+    }
+});
+
+// Keyboard navigation for search
+document.getElementById('productSearch').addEventListener('keydown', function(e) {
+    const results = document.querySelectorAll('.result-item:not([style*="pointer-events: none"])');
+    const highlighted = document.querySelector('.result-item.highlighted');
+    
+    if (e.key === 'ArrowDown') {
+        e.preventDefault();
+        if (results.length > 0) {
+            let nextIndex = 0;
+            if (highlighted) {
+                const currentIndex = Array.from(results).indexOf(highlighted);
+                nextIndex = (currentIndex + 1) % results.length;
+                highlighted.classList.remove('highlighted');
+            }
+            results[nextIndex].classList.add('highlighted');
+        }
+    } else if (e.key === 'ArrowUp') {
+        e.preventDefault();
+        if (results.length > 0) {
+            let prevIndex = results.length - 1;
+            if (highlighted) {
+                const currentIndex = Array.from(results).indexOf(highlighted);
+                prevIndex = currentIndex > 0 ? currentIndex - 1 : results.length - 1;
+                highlighted.classList.remove('highlighted');
+            }
+            results[prevIndex].classList.add('highlighted');
+        }
+    } else if (e.key === 'Enter') {
+        e.preventDefault();
+        if (highlighted) {
+            highlighted.click();
+        } else if (results.length > 0) {
+            results[0].click();
+        }
+    } else if (e.key === 'Escape') {
+        hideSearchResults();
+        this.blur();
+    }
+});
+
+// Auto-focus search on page load
+document.addEventListener('DOMContentLoaded', function() {
+    setTimeout(() => {
+        document.getElementById('productSearch').focus();
+    }, 500);
+});
+
+function searchProducts(query) {
+    const resultsDiv = document.getElementById('searchResults');
+    
+    fetch(`/billing/search-products/?q=${encodeURIComponent(query)}`)
+        .then(response => response.json())
+        .then(data => {
+            displaySearchResults(data.products || []);
+        })
+        .catch(error => {
+            console.error('Search error:', error);
+            hideSearchResults();
+        });
+}
+
+function displaySearchResults(products) {
+    const resultsDiv = document.getElementById('searchResults');
+    
+    if (products.length === 0) {
+        resultsDiv.innerHTML = '<div class="result-item" style="color: #999; text-align: center;">کوئی پروڈکٹ نہیں ملا</div>';
+        resultsDiv.style.display = 'block';
+        return;
+    }
+    
+    resultsDiv.innerHTML = '';
+    products.forEach((product, index) => {
+        const resultItem = document.createElement('div');
+        resultItem.className = 'result-item';
+        resultItem.dataset.productId = product.id;
+        
+        const stockColor = product.stock > 10 ? '#28a745' : product.stock > 0 ? '#ffc107' : '#dc3545';
+        const stockText = product.stock > 0 ? `اسٹاک: ${product.stock}` : 'اسٹاک ختم';
+        
+        if (product.stock > 0) {
+            resultItem.onclick = () => addProductToCart(product);
+            resultItem.style.cursor = 'pointer';
+        } else {
+            resultItem.style.opacity = '0.5';
+            resultItem.style.cursor = 'not-allowed';
+            resultItem.onclick = () => alert('❌ اسٹاک ختم');
+        }
+        
+        resultItem.innerHTML = `
+            <div>
+                <div class="result-name">${product.name}</div>
+                <div class="result-stock" style="color: ${stockColor}">${stockText}</div>
+                ${product.barcode ? `<div class="result-barcode" style="font-size: 10px; color: #6c757d;">بارکوڈ: ${product.barcode}</div>` : ''}
+            </div>
+            <div class="result-price">Rs. ${product.price}</div>
+        `;
+        
+        resultsDiv.appendChild(resultItem);
+    });
+    
+    resultsDiv.style.display = 'block';
+}
+
+function addProductToCart(product) {
+    // Check if product already in cart
+    const existingCartItem = cart[product.id];
+    const currentQty = existingCartItem ? existingCartItem.quantity : 0;
+    
+    if (currentQty >= product.stock) {
+        alert(`⚠️ صرف ${product.stock} اشیاء اسٹاک میں دستیاب ہیں!`);
+        return;
+    }
+    
+    // Add to cart with quantity 1
+    addToCartWithQuantity(product.id, 1);
+    
+    // Clear search and focus back
+    clearSearchAndReset();
+    
+    // Show success feedback
+    showAddedFeedback(product.name);
+}
+
+function showAddedFeedback(productName) {
+    const searchInput = document.getElementById('productSearch');
+    const originalPlaceholder = searchInput.placeholder;
+    
+    searchInput.placeholder = `✅ شامل کیا گیا: ${productName}`;
+    searchInput.style.borderColor = '#28a745';
+    
+    setTimeout(() => {
+        searchInput.placeholder = originalPlaceholder;
+        searchInput.style.borderColor = '#007bff';
+    }, 2000);
+}
+
+function hideSearchResults() {
+    const resultsDiv = document.getElementById('searchResults');
+    resultsDiv.style.display = 'none';
+    resultsDiv.innerHTML = '';
+}
+
+function clearSearchAndReset() {
+    const searchInput = document.getElementById('productSearch');
+    searchInput.value = '';
+    hideSearchResults();
+    
+    // Focus back on search for next product
+    setTimeout(() => {
+        searchInput.focus();
+    }, 100);
+}
+
+function addToCartWithQuantity(productId, quantity) {
+    fetch('/billing/add-to-cart/', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+        },
+        body: JSON.stringify({
+            product_id: productId,
+            quantity: quantity
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            cart = data.cart;
+            updateCartDisplay();
+        } else {
+            alert(data.error || 'کارٹ میں شامل کرنے میں خرابی');
+        }
+    })
+    .catch(error => {
+        console.error('Add to cart error:', error);
+        alert('کارٹ میں شامل کرنے میں خرابی');
+    });
+}
+
+function updateCartDisplay() {
+    const cartItems = document.getElementById('cartItems');
+    const totalsSection = document.getElementById('totalsSection');
+    const clearBtn = document.getElementById('clearBtn');
+    const checkoutBtn = document.getElementById('checkoutBtn');
+    
+    if (Object.keys(cart).length === 0) {
+        cartItems.innerHTML = `
+            <div class="empty-cart">
+                <p>کارٹ خالی ہے</p>
+                <small>شروع کرنے کے لیے پروڈکٹس تلاش کر کے شامل کریں</small>
+            </div>
+        `;
+        if (totalsSection) totalsSection.style.display = 'none';
+        clearBtn.style.display = 'none';
+        checkoutBtn.disabled = true;
+        checkoutBtn.textContent = 'فروخت مکمل کریں - Rs. 0.00';
+        return;
+    }
+    
+    let html = '';
+    let subtotal = 0;
+    
+    Object.entries(cart).forEach(([productId, item]) => {
+        const itemTotal = item.price * item.quantity;
+        subtotal += itemTotal;
+        
+        html += `
+            <div class="cart-item">
+                <div class="item-info">
+                    <div class="item-name">${item.name}</div>
+                    <div class="item-price">Rs. ${item.price} × ${item.quantity} = Rs. ${itemTotal.toFixed(2)}</div>
+                </div>
+                <div class="item-controls">
+                    <button class="qty-btn" onclick="updateQuantity(${productId}, ${item.quantity - 1})">-</button>
+                    <input type="number" class="cart-qty-input" value="${item.quantity}" onchange="updateQuantity(${productId}, this.value)" min="1">
+                    <button class="qty-btn" onclick="updateQuantity(${productId}, ${item.quantity + 1})">+</button>
+                    <span class="remove-btn" onclick="removeFromCart(${productId})" title="ہٹائیں">×</span>
+                </div>
+            </div>
+        `;
+    });
+    
+    cartItems.innerHTML = html;
+    
+    // Update totals
+    const tax = 0;
+    const discount = 0;
+    const total = subtotal + tax - discount;
+    
+    if (document.getElementById('subtotal')) {
+        document.getElementById('subtotal').textContent = `Rs. ${subtotal.toFixed(2)}`;
+        document.getElementById('tax').textContent = `Rs. ${tax.toFixed(2)}`;
+        document.getElementById('discount').textContent = `Rs. ${discount.toFixed(2)}`;
+        document.getElementById('total').textContent = `Rs. ${total.toFixed(2)}`;
+        totalsSection.style.display = 'block';
+    }
+    
+    clearBtn.style.display = 'block';
+    checkoutBtn.disabled = false;
+    checkoutBtn.textContent = `فروخت مکمل کریں - Rs. ${total.toFixed(2)}`;
+}
+
+function updateQuantity(productId, newQuantity) {
+    if (newQuantity <= 0) {
+        removeFromCart(productId);
+        return;
+    }
+    
+    fetch('/billing/update-cart/', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+        },
+        body: JSON.stringify({
+            product_id: productId,
+            quantity: parseInt(newQuantity)
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            cart = data.cart;
+            updateCartDisplay();
+        }
+    });
+}
+
+function removeFromCart(productId) {
+    fetch('/billing/remove-from-cart/', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+        },
+        body: JSON.stringify({
+            product_id: productId
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            cart = data.cart;
+            updateCartDisplay();
+        }
+    });
+}
+
+function clearCart() {
+    if (confirm('کارٹ سے تمام اشیاء ہٹا دیں؟')) {
+        fetch('/billing/clear-cart/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                cart = {};
+                updateCartDisplay();
+            }
+        });
+    }
+}
+
+function checkout() {
+    const subtotal = parseFloat(document.getElementById('subtotal').textContent.replace('Rs. ', ''));
+    const tax = parseFloat(document.getElementById('tax').textContent.replace('Rs. ', ''));
+    const discount = parseFloat(document.getElementById('discount').textContent.replace('Rs. ', ''));
+    const total = parseFloat(document.getElementById('total').textContent.replace('Rs. ', ''));
+    
+    const billData = {
+        customer_name: document.getElementById('customerName').value,
+        customer_phone: document.getElementById('customerPhone').value,
+        payment_type: selectedPaymentMethod,
+        subtotal: subtotal,
+        tax: tax,
+        discount: discount,
+        total: total
+    };
+    
+    fetch('/billing/create-bill/', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+        },
+        body: JSON.stringify(billData)
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert(`بل کامیابی سے بن گیا! بل #${data.bill_number}`);
+            cart = {};
+            updateCartDisplay();
+            document.getElementById('customerName').value = '';
+            document.getElementById('customerPhone').value = '';
+            // Redirect to bill detail
+            window.open(`/billing/bill/${data.bill_id}/`, '_blank');
+        } else {
+            alert(data.error || 'بل بنانے میں خرابی');
+        }
+    });
+}
+
+// Payment method selection
+document.querySelectorAll('.payment-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+        document.querySelectorAll('.payment-btn').forEach(b => b.classList.remove('active'));
+        this.classList.add('active');
+        selectedPaymentMethod = this.dataset.method;
+    });
+});
+
+// Customer search functionality
+function searchCustomer(phone) {
+    if (phone.length < 3) {
+        hideCustomerSuggestions();
+        return;
+    }
+    
+    fetch(`/billing/search-customers/?phone=${phone}`)
+        .then(response => response.json())
+        .then(data => {
+            displayCustomerSuggestions(data.customers);
+        })
+        .catch(error => {
+            console.error('Customer search error:', error);
+        });
+}
+
+function displayCustomerSuggestions(customers) {
+    const suggestionsDiv = document.getElementById('customerSuggestions');
+    
+    if (customers.length === 0) {
+        hideCustomerSuggestions();
+        return;
+    }
+    
+    suggestionsDiv.innerHTML = '';
+    customers.forEach(customer => {
+        const suggestionItem = document.createElement('div');
+        suggestionItem.className = 'customer-suggestion';
+        suggestionItem.onclick = () => selectCustomer(customer);
+        
+        suggestionItem.innerHTML = `
+            <div class="suggestion-name">${customer.name}</div>
+            <div class="suggestion-phone">${customer.phone}</div>
+            ${customer.email ? `<div class="suggestion-email">${customer.email}</div>` : ''}
+        `;
+        
+        suggestionsDiv.appendChild(suggestionItem);
+    });
+    
+    suggestionsDiv.style.display = 'block';
+}
+
+function selectCustomer(customer) {
+    document.getElementById('customerPhone').value = customer.phone;
+    document.getElementById('customerName').value = customer.name;
+    document.getElementById('customerEmail').value = customer.email || '';
+    hideCustomerSuggestions();
+}
+
+function hideCustomerSuggestions() {
+    document.getElementById('customerSuggestions').style.display = 'none';
+}
+
+// Barcode scanner
+function startBarcodeScanner() {
+    // Check if device has camera
+    if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+        // Try to use camera for scanning
+        navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } })
+            .then(function(stream) {
+                // Create video element for camera preview
+                const modal = document.createElement('div');
+                modal.style.cssText = `
+                    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+                    background: rgba(0,0,0,0.8); z-index: 9999; display: flex;
+                    align-items: center; justify-content: center; flex-direction: column;
+                `;
+                
+                const video = document.createElement('video');
+                video.style.cssText = 'width: 300px; height: 200px; border: 2px solid white;';
+                video.srcObject = stream;
+                video.autoplay = true;
+                
+                const closeBtn = document.createElement('button');
+                closeBtn.textContent = 'کیمرہ بند کریں';
+                closeBtn.style.cssText = `
+                    margin-top: 10px; padding: 10px 20px; background: #dc3545;
+                    color: white; border: none; border-radius: 5px; cursor: pointer;
+                `;
+                
+                const manualBtn = document.createElement('button');
+                manualBtn.textContent = 'دستی داخل کریں';
+                manualBtn.style.cssText = `
+                    margin-top: 10px; margin-left: 10px; padding: 10px 20px;
+                    background: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer;
+                `;
+                
+                closeBtn.onclick = function() {
+                    stream.getTracks().forEach(track => track.stop());
+                    document.body.removeChild(modal);
+                };
+                
+                manualBtn.onclick = function() {
+                    stream.getTracks().forEach(track => track.stop());
+                    document.body.removeChild(modal);
+                    manualBarcodeEntry();
+                };
+                
+                modal.appendChild(video);
+                modal.appendChild(document.createElement('br'));
+                modal.appendChild(closeBtn);
+                modal.appendChild(manualBtn);
+                
+                const instruction = document.createElement('p');
+                instruction.textContent = 'کیمرہ بارکوڈ پر رکھیں یا دستی داخل کریں';
+                instruction.style.color = 'white';
+                modal.insertBefore(instruction, video);
+                
+                document.body.appendChild(modal);
+                
+                // Auto close after 10 seconds
+                setTimeout(() => {
+                    if (document.body.contains(modal)) {
+                        closeBtn.click();
+                    }
+                }, 10000);
+            })
+            .catch(function(err) {
+                console.log('Camera access denied:', err);
+                manualBarcodeEntry();
+            });
+    } else {
+        manualBarcodeEntry();
+    }
+}
+
+function manualBarcodeEntry() {
+    const barcode = prompt('بارکوڈ داخل کریں:');
+    if (barcode && barcode.trim()) {
+        searchAndAddByBarcode(barcode.trim());
+    }
+}
+
+function searchAndAddByBarcode(barcode) {
+    fetch(`/billing/search-products/?q=${encodeURIComponent(barcode)}`)
+        .then(response => response.json())
+        .then(data => {
+            const products = data.products || [];
+            if (products.length > 0) {
+                const product = products[0]; // Take first match
+                if (product.stock > 0) {
+                    addProductToCart(product);
+                } else {
+                    alert('❌ پروڈکٹ اسٹاک میں نہیں!');
+                }
+            } else {
+                alert('❌ پروڈکٹ نہیں ملا!');
+            }
+        })
+        .catch(error => {
+            console.error('Barcode search error:', error);
+            alert('❌ تلاش میں خرابی۔ دوبارہ کوشش کریں۔');
+        });
+}
+</script>
+
+<script>
+function toggleSidebar() {
+    const sidebar = document.getElementById('dashboardSidebar');
+    const mainContent = document.querySelector('.main-content');
+    const icon = document.getElementById('sidebarToggleIcon');
+    
+    if (sidebar.classList.contains('hidden')) {
+        sidebar.classList.remove('hidden');
+        mainContent.classList.remove('expanded');
+        icon.textContent = '«';
+    } else {
+        sidebar.classList.add('hidden');
+        mainContent.classList.add('expanded');
+        icon.textContent = '»';
+    }
+}
+</script>
+
+{% csrf_token %}
+{% endblock %}

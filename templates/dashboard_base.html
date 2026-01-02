@@ -1,0 +1,107 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block extra_css %}
+<!-- Bootstrap CSS (if not already loaded) -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+<!-- Unified Sidebar CSS - ALWAYS LOAD -->
+<link rel="stylesheet" href="{% static 'css/unified-sidebar.css' %}">
+<!-- Mobile CSS -->
+<link rel="stylesheet" href="{% static 'css/mobile.css' %}">
+<style>
+/* Responsive Dashboard Layout */
+body {
+    margin: 0;
+    padding: 0;
+}
+
+.dashboard-container {
+    display: flex;
+    min-height: calc(100vh - 70px);
+}
+
+/* Desktop Sidebar */
+.sidebar {
+    position: fixed;
+    left: 0;
+    top: 70px;
+    width: 280px;
+    height: calc(100vh - 70px);
+    z-index: 1000;
+    transition: transform 0.3s ease;
+}
+
+.main-content {
+    margin-left: 280px;
+    width: calc(100% - 280px);
+    padding: 30px;
+    transition: margin-left 0.3s ease, width 0.3s ease;
+}
+
+/* Mobile Responsive - Handled by mobile.css */
+</style>
+{% block dashboard_css %}{% endblock %}
+{% endblock %}
+
+{% block content %}
+<!-- Mobile Sidebar Toggle -->
+<button class="sidebar-toggle d-md-none" id="sidebarToggle">
+    ☰
+</button>
+
+<!-- Sidebar Overlay for Mobile -->
+<div class="sidebar-overlay d-md-none" id="sidebarOverlay"></div>
+
+<div class="dashboard-container">
+    <!-- UNIFIED SIDEBAR - Always Present -->
+    {% include 'includes/unified_sidebar.html' %}
+
+    <!-- Main Content -->
+    <main class="main-content" id="mainContent">
+        <div class="container-fluid">
+            {% block dashboard_content %}{% endblock %}
+        </div>
+    </main>
+</div>
+
+<script>
+// Responsive Sidebar Toggle
+document.addEventListener('DOMContentLoaded', function() {
+    const sidebar = document.getElementById('dashboardSidebar');
+    const sidebarToggle = document.getElementById('sidebarToggle');
+    const sidebarOverlay = document.getElementById('sidebarOverlay');
+    const mainContent = document.getElementById('mainContent');
+    
+    // Toggle sidebar on mobile
+    if (sidebarToggle) {
+        sidebarToggle.addEventListener('click', function() {
+            if (sidebar) {
+                sidebar.classList.toggle('show');
+                sidebarOverlay.classList.toggle('show');
+            }
+        });
+    }
+    
+    // Close sidebar when clicking overlay
+    if (sidebarOverlay) {
+        sidebarOverlay.addEventListener('click', function() {
+            if (sidebar) {
+                sidebar.classList.remove('show');
+                sidebarOverlay.classList.remove('show');
+            }
+        });
+    }
+    
+    // Close sidebar on window resize to desktop
+    window.addEventListener('resize', function() {
+        if (window.innerWidth > 768) {
+            if (sidebar) {
+                sidebar.classList.remove('show');
+                sidebarOverlay.classList.remove('show');
+            }
+        }
+    });
+});
+</script>
+{% block dashboard_js %}{% endblock %}
+{% endblock %}

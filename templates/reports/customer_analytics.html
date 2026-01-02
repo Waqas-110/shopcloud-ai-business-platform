@@ -1,0 +1,59 @@
+{% extends 'dashboard_base.html' %}
+{% load static %}
+
+{% block title %}Customer Analytics - ShopCloud{% endblock %}
+
+{% block dashboard_content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2><i class="fas fa-users"></i> Customer Analytics</h2>
+                <a href="{% url 'reports:dashboard' %}" class="btn btn-secondary">← Back to Reports</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Date Range Filter -->
+    {% include 'reports/date_range_filter.html' %}
+
+    <!-- Customer Data -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5>Top Customers ({{ start_date|date:"M d" }} - {{ end_date|date:"M d, Y" }})</h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Customer Name</th>
+                                    <th>Total Spent</th>
+                                    <th>Visit Count</th>
+                                    <th>Avg per Visit</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for customer in customer_data %}
+                                <tr>
+                                    <td>{{ customer.customer_name }}</td>
+                                    <td>₨{{ customer.total_spent|floatformat:2 }}</td>
+                                    <td>{{ customer.visit_count }}</td>
+                                    <td>₨{{ customer.total_spent|div:customer.visit_count|floatformat:2 }}</td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="4" class="text-center">No customer data available for this period</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

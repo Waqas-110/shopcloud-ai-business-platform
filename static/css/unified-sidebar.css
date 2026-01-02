@@ -1,0 +1,250 @@
+/* =========================================================
+   UNIFIED SIDEBAR SYSTEM - ShopCloud
+   Consistent styling for all pages
+   ========================================================= */
+
+/* Dashboard Container */
+.dashboard-container {
+    display: flex !important;
+    min-height: calc(100vh - 70px);
+    background: #f8f9fa;
+}
+
+/* UNIFIED SIDEBAR - Same for all pages */
+.sidebar {
+    width: 280px !important;
+    background: linear-gradient(180deg, #1f2937 0%, #111827 100%) !important;
+    box-shadow: 2px 0 20px rgba(0,0,0,0.1);
+    position: fixed !important;
+    height: calc(100vh - 70px) !important;
+    overflow-y: auto;
+    color: white !important;
+    transition: transform 0.3s ease;
+    z-index: 1000 !important;
+    left: 0 !important;
+    top: 70px !important;
+    display: block !important;
+    direction: ltr !important; /* Always LTR for sidebar */
+}
+
+.sidebar.hidden {
+    transform: translateX(-100%);
+}
+
+/* Sidebar Header - Consistent */
+.sidebar-header {
+    padding: 25px 20px !important;
+    border-bottom: 1px solid rgba(255,255,255,0.1) !important;
+    background: rgba(0,0,0,0.2) !important;
+}
+
+.sidebar-header h3 {
+    margin: 0 !important;
+    font-size: 1.3rem !important;
+    color: white !important;
+    font-weight: 600;
+}
+
+.sidebar-header h4 {
+    margin: 10px 0 5px 0 !important;
+    color: #fbbf24 !important;
+    font-size: 1.1rem !important;
+    font-weight: 600;
+}
+
+.sidebar-header p {
+    margin: 0 !important;
+    opacity: 0.8;
+    font-size: 0.9rem !important;
+    color: #d1d5db !important;
+}
+
+/* Sidebar Menu - Consistent */
+.sidebar-menu {
+    list-style: none !important;
+    padding: 10px 0 !important;
+    margin: 0 !important;
+}
+
+.sidebar-menu li {
+    margin: 2px 0 !important;
+    border-bottom: none !important;
+}
+
+.sidebar-menu a {
+    display: flex !important;
+    align-items: center;
+    gap: 12px;
+    padding: 15px 20px !important;
+    color: #d1d5db !important;
+    text-decoration: none !important;
+    transition: all 0.3s;
+    border-left: 3px solid transparent !important;
+    border-right: none !important;
+    font-size: 0.95rem;
+    font-weight: 500;
+}
+
+.sidebar-menu a:hover {
+    background: rgba(255,255,255,0.1) !important;
+    color: white !important;
+    border-left-color: #3b82f6 !important;
+}
+
+.sidebar-menu a.active {
+    background: rgba(59, 130, 246, 0.2) !important;
+    color: white !important;
+    border-left-color: #3b82f6 !important;
+}
+
+.sidebar-menu a i {
+    font-size: 1.1rem !important;
+    width: 20px;
+    text-align: center;
+    margin-right: 0 !important;
+    font-style: normal;
+}
+
+/* Sidebar Toggle Button */
+.sidebar-toggle {
+    background: rgba(255,255,255,0.1) !important;
+    border: none !important;
+    color: white !important;
+    font-size: 16px;
+    cursor: pointer;
+    padding: 6px 10px;
+    border-radius: 4px;
+    transition: background 0.3s;
+}
+
+.sidebar-toggle:hover {
+    background: rgba(255,255,255,0.2) !important;
+}
+
+/* Language Switcher in Sidebar */
+.sidebar .language-switcher {
+    margin-top: 15px;
+    display: flex;
+    gap: 3px;
+    background: rgba(255,255,255,0.1);
+    border-radius: 15px;
+    padding: 3px;
+}
+
+.sidebar .language-switcher a {
+    padding: 6px 12px !important;
+    border-radius: 12px;
+    text-decoration: none;
+    font-size: 12px;
+    transition: all 0.3s;
+    color: #d1d5db !important;
+    border: none !important;
+    gap: 0 !important;
+}
+
+.sidebar .language-switcher a.active,
+.sidebar .language-switcher a:hover {
+    background: rgba(59, 130, 246, 0.8) !important;
+    color: white !important;
+}
+
+/* Main Content */
+.main-content {
+    flex: 1 !important;
+    margin-left: 280px !important;
+    padding: 30px !important;
+    transition: margin-left 0.3s ease;
+    min-height: calc(100vh - 70px);
+}
+
+.main-content.expanded {
+    margin-left: 0 !important;
+}
+
+/* RTL Support for Urdu Content (but not sidebar) */
+.rtl-content {
+    direction: rtl;
+    text-align: right;
+}
+
+.rtl-content .sidebar {
+    direction: ltr !important; /* Keep sidebar LTR */
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+    .sidebar {
+        width: 100% !important;
+        height: auto !important;
+        position: relative !important;
+        top: 0 !important;
+        transform: none !important;
+    }
+    
+    .sidebar.hidden {
+        display: none !important;
+    }
+    
+    .main-content {
+        margin-left: 0 !important;
+        padding: 20px 15px !important;
+    }
+    
+    .sidebar-header {
+        padding: 20px !important;
+    }
+}
+
+@media (max-width: 480px) {
+    .sidebar-header {
+        padding: 15px !important;
+    }
+    
+    .sidebar-menu a {
+        padding: 12px 15px !important;
+        font-size: 0.9rem;
+    }
+    
+    .main-content {
+        padding: 15px 10px !important;
+    }
+}
+
+/* Override any conflicting styles */
+.sidebar * {
+    box-sizing: border-box;
+}
+
+/* FORCE SIDEBAR CONSISTENCY - HIGHEST PRIORITY */
+.sidebar, #dashboardSidebar {
+    visibility: visible !important;
+    opacity: 1 !important;
+    display: block !important;
+    position: fixed !important;
+    left: 0 !important;
+    top: 70px !important;
+    width: 280px !important;
+    height: calc(100vh - 70px) !important;
+    z-index: 9999 !important;
+    background: linear-gradient(180deg, #1f2937 0%, #111827 100%) !important;
+}
+
+/* Force main content positioning */
+.main-content, #mainContent {
+    margin-left: 280px !important;
+    width: calc(100% - 280px) !important;
+    padding: 30px !important;
+    min-height: calc(100vh - 70px) !important;
+}
+
+/* Override any conflicting styles with maximum specificity */
+body .dashboard-container .sidebar,
+body .sidebar,
+body #dashboardSidebar {
+    position: fixed !important;
+    left: 0 !important;
+    top: 70px !important;
+    width: 280px !important;
+    display: block !important;
+    visibility: visible !important;
+}

@@ -1,0 +1,528 @@
+{% extends 'dashboard_base.html' %}
+{% load static %}
+
+{% block title %}Reports Dashboard{% endblock %}
+
+{% block dashboard_css %}
+<style>
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 20px;
+    margin-bottom: 30px;
+}
+
+.stat-card {
+    background: white;
+    padding: 25px;
+    border-radius: 15px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+    display: flex;
+    align-items: center;
+    transition: all 0.3s;
+    border-left: 4px solid transparent;
+}
+
+.stat-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+}
+
+.stat-card:nth-child(1) {
+    border-left-color: #10b981;
+}
+
+.stat-card:nth-child(2) {
+    border-left-color: #2563eb;
+}
+
+.stat-card:nth-child(3) {
+    border-left-color: #f59e0b;
+}
+
+.stat-card:nth-child(4) {
+    border-left-color: #ef4444;
+}
+
+.stat-icon {
+    font-size: 3rem;
+    margin-right: 20px;
+    width: 60px;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #f3f4f6;
+    border-radius: 12px;
+}
+
+.stat-info h3 {
+    margin: 0;
+    font-size: 2rem;
+    color: #1f2937;
+    font-weight: 800;
+}
+
+.stat-info p {
+    margin: 5px 0 0 0;
+    color: #6b7280;
+    font-size: 0.95rem;
+    font-weight: 500;
+}
+
+.quick-actions {
+    background: white;
+    padding: 30px;
+    border-radius: 15px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+    margin-bottom: 30px;
+}
+
+.quick-actions h2 {
+    margin: 0 0 25px 0;
+    color: #1f2937;
+    font-size: 1.5rem;
+    font-weight: 700;
+}
+
+.actions-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 15px;
+}
+
+.action-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 25px 20px;
+    background: linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%);
+    border-radius: 12px;
+    text-decoration: none;
+    color: #1f2937;
+    transition: all 0.3s;
+    border: 2px solid transparent;
+}
+
+.action-btn:hover {
+    background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+    color: white;
+    transform: translateY(-5px);
+    box-shadow: 0 8px 20px rgba(37, 99, 235, 0.3);
+    border-color: #2563eb;
+    text-decoration: none;
+}
+
+.action-btn i {
+    font-size: 2.5rem;
+    margin-bottom: 12px;
+}
+
+.action-btn span {
+    font-weight: 600;
+    font-size: 0.95rem;
+}
+
+.chart-section {
+    background: white;
+    padding: 30px;
+    border-radius: 15px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+    margin-bottom: 30px;
+}
+
+.chart-section h3 {
+    margin: 0 0 25px 0;
+    color: #1f2937;
+    font-size: 1.3rem;
+    font-weight: 700;
+    border-bottom: 2px solid #e5e7eb;
+    padding-bottom: 15px;
+}
+
+.chart-container canvas {
+    max-height: 300px !important;
+}
+
+.top-products-table {
+    background: white;
+    padding: 30px;
+    border-radius: 15px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+    margin-bottom: 30px;
+}
+
+.top-products-table h3 {
+    margin: 0 0 25px 0;
+    color: #1f2937;
+    font-size: 1.3rem;
+    font-weight: 700;
+    border-bottom: 2px solid #e5e7eb;
+    padding-bottom: 15px;
+}
+
+.table {
+    margin-bottom: 0;
+}
+
+.table th {
+    border-top: none;
+    border-bottom: 2px solid #e5e7eb;
+    font-weight: 600;
+    color: #1f2937;
+    padding: 15px 10px;
+}
+
+.table td {
+    border-top: 1px solid #f8f9fa;
+    padding: 15px 10px;
+    vertical-align: middle;
+}
+
+.badge {
+    padding: 8px 12px;
+    border-radius: 8px;
+    font-weight: 500;
+}
+
+.report-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 20px;
+}
+
+.report-card {
+    background: white;
+    padding: 30px;
+    border-radius: 15px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+    text-align: center;
+    transition: all 0.3s;
+}
+
+.report-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+}
+
+.report-icon {
+    font-size: 3rem;
+    margin-bottom: 20px;
+    width: 80px;
+    height: 80px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #f3f4f6;
+    border-radius: 15px;
+    margin: 0 auto 20px;
+}
+
+.report-card h5 {
+    color: #1f2937;
+    font-weight: 700;
+    margin-bottom: 15px;
+}
+
+.report-card p {
+    color: #6b7280;
+    margin-bottom: 25px;
+    line-height: 1.6;
+}
+
+@media (max-width: 768px) {
+    .main-content {
+        margin-left: 0;
+        padding: 20px 15px;
+    }
+    
+    .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .actions-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .report-cards {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 480px) {
+    .stats-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .actions-grid {
+        grid-template-columns: 1fr;
+    }
+}
+</style>
+{% endblock %}
+
+{% block dashboard_content %}
+        <div style="margin-bottom: 30px;">
+            <h1 style="color: #1f2937; font-size: 2rem; font-weight: 700; margin-bottom: 10px;">
+                <i class="fas fa-chart-line" style="margin-right: 15px; color: #2563eb;"></i>Reports & Analytics
+            </h1>
+            <p style="color: #6b7280; margin: 0;">Comprehensive business insights and performance metrics</p>
+        </div>
+
+        <!-- Stats Cards -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon">💰</div>
+                <div class="stat-info">
+                    <h3>₨{{ today_sales|floatformat:0 }}</h3>
+                    <p>Today's Sales</p>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">📅</div>
+                <div class="stat-info">
+                    <h3>₨{{ week_sales|floatformat:0 }}</h3>
+                    <p>This Week</p>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">📊</div>
+                <div class="stat-info">
+                    <h3>₨{{ month_sales|floatformat:0 }}</h3>
+                    <p>This Month</p>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">⚠️</div>
+                <div class="stat-info">
+                    <h3>{{ low_stock_count }}</h3>
+                    <p>Low Stock Items</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="quick-actions">
+            <h2>Quick Actions</h2>
+            <div class="actions-grid">
+
+                <a href="{% url 'billing:pos' %}" class="action-btn">
+                    <i>🛒</i>
+                    <span>New Sale</span>
+                </a>
+                <a href="{% url 'products:add' %}" class="action-btn">
+                    <i>📦</i>
+                    <span>Add Product</span>
+                </a>
+                <a href="{% url 'billing:bill_history' %}" class="action-btn">
+                    <i>📋</i>
+                    <span>Bill History</span>
+                </a>
+            </div>
+        </div>
+
+        <!-- Charts Row -->
+        <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 20px; margin-bottom: 30px;">
+            <div class="chart-section">
+                <h3>📈 Sales Trend (Last 7 Days)</h3>
+                <canvas id="salesChart" style="max-height: 300px;"></canvas>
+            </div>
+            <div class="chart-section">
+                <h3>🥧 Category Sales</h3>
+                <canvas id="categoryChart"></canvas>
+            </div>
+        </div>
+
+        <!-- Additional Charts Row -->
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 30px;">
+            <div class="chart-section">
+                <h3>💳 Payment Methods</h3>
+                <canvas id="paymentChart"></canvas>
+            </div>
+            <div class="chart-section">
+                <h3>⏰ Hourly Sales (Today)</h3>
+                <canvas id="hourlyChart"></canvas>
+            </div>
+        </div>
+
+        <!-- Top Products -->
+        <div class="top-products-table">
+            <h3>🏆 Top Selling Products</h3>
+            {% if top_products %}
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Product Name</th>
+                                <th>Quantity Sold</th>
+                                <th>Revenue</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for product in top_products %}
+                            <tr>
+                                <td><strong>{{ product.product__name }}</strong></td>
+                                <td><span class="badge bg-primary">{{ product.total_qty }} units</span></td>
+                                <td><strong>₨{{ product.total_sales|floatformat:0 }}</strong></td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <div style="text-align: center; padding: 40px; color: #6b7280;">
+                    <div style="font-size: 3rem; margin-bottom: 15px;">📊</div>
+                    <p>No sales data available</p>
+                </div>
+            {% endif %}
+        </div>
+
+
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+// Sales Chart
+fetch('{% url "reports:sales_chart_data" %}')
+    .then(response => response.json())
+    .then(data => {
+        const ctx = document.getElementById('salesChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: data.daily_sales.map(item => {
+                    const date = new Date(item.date);
+                    return date.toLocaleDateString('en-US', {month: 'short', day: 'numeric'});
+                }),
+                datasets: [{
+                    label: 'Sales (₨)',
+                    data: data.daily_sales.map(item => item.sales),
+                    borderColor: '#2563eb',
+                    backgroundColor: 'rgba(37, 99, 235, 0.1)',
+                    tension: 0.4,
+                    fill: true
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: true,
+                aspectRatio: 2.5,
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            callback: function(value) {
+                                return '₨' + value.toLocaleString();
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    });
+
+// Category Chart
+fetch('{% url "reports:category_sales_data" %}')
+    .then(response => response.json())
+    .then(data => {
+        const ctx = document.getElementById('categoryChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: data.category_sales.map(item => item.product__category__name || 'Uncategorized'),
+                datasets: [{
+                    data: data.category_sales.map(item => item.total_sales),
+                    backgroundColor: [
+                        '#2563eb', '#10b981', '#f59e0b', '#ef4444',
+                        '#8b5cf6', '#06b6d4', '#84cc16', '#f97316'
+                    ]
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: true,
+                aspectRatio: 1,
+                plugins: {
+                    legend: {
+                        position: 'bottom'
+                    }
+                }
+            }
+        });
+    });
+
+// Payment Methods Chart
+fetch('{% url "reports:payment_methods_data" %}')
+    .then(response => response.json())
+    .then(data => {
+        const ctx = document.getElementById('paymentChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'pie',
+            data: {
+                labels: data.payment_data.map(item => item.payment_type || 'Cash'),
+                datasets: [{
+                    data: data.payment_data.map(item => item.total),
+                    backgroundColor: ['#10b981', '#2563eb', '#f59e0b', '#ef4444']
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: true,
+                aspectRatio: 1,
+                plugins: {
+                    legend: {
+                        position: 'bottom'
+                    }
+                }
+            }
+        });
+    });
+
+// Hourly Sales Chart
+fetch('{% url "reports:hourly_sales_data" %}')
+    .then(response => response.json())
+    .then(data => {
+        const ctx = document.getElementById('hourlyChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: data.hourly_sales.map(item => item.hour),
+                datasets: [{
+                    label: 'Sales (₨)',
+                    data: data.hourly_sales.map(item => item.sales),
+                    backgroundColor: '#2563eb',
+                    borderRadius: 4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: true,
+                aspectRatio: 2,
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            callback: function(value) {
+                                return '₨' + value.toLocaleString();
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    });
+</script>
+{% endblock %}

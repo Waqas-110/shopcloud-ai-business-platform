@@ -1,0 +1,302 @@
+{% extends 'dashboard_base.html' %}
+{% load static %}
+
+{% block title %}Dashboard - ShopCloud{% endblock %}
+
+{% block dashboard_css %}
+<link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
+{% endblock %}
+
+{% block dashboard_content %}
+        <!-- Stats Cards -->
+        <div class="row g-3 mb-4">
+            <div class="col-lg-3 col-md-6">
+                <div class="stat-card card h-100 border-0 shadow-sm">
+                    <div class="card-body d-flex align-items-center">
+                        <div class="stat-icon me-3 fs-2">💰</div>
+                        <div class="stat-info">
+                            <h3 class="h5 mb-1">Rs. {{ today_report.total_sales|floatformat:0|default:"0" }}</h3>
+                            <p class="text-muted mb-0 small">Today's Sales</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6">
+                <div class="stat-card card h-100 border-0 shadow-sm">
+                    <div class="card-body d-flex align-items-center">
+                        <div class="stat-icon me-3 fs-2">📋</div>
+                        <div class="stat-info">
+                            <h3 class="h5 mb-1">{{ today_report.total_bills|default:"0" }}</h3>
+                            <p class="text-muted mb-0 small">Total Bills</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6">
+                <div class="stat-card card h-100 border-0 shadow-sm">
+                    <div class="card-body d-flex align-items-center">
+                        <div class="stat-icon me-3 fs-2">📦</div>
+                        <div class="stat-info">
+                            <h3 class="h5 mb-1">{{ user.shop.product_set.count|default:"0" }}</h3>
+                            <p class="text-muted mb-0 small">Total Products</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6">
+                <div class="stat-card card h-100 border-0 shadow-sm">
+                    <div class="card-body d-flex align-items-center">
+                        <div class="stat-icon me-3 fs-2">⚠️</div>
+                        <div class="stat-info">
+                            <h3 class="h5 mb-1">{{ low_stock_products|length|default:"0" }}</h3>
+                            <p class="text-muted mb-0 small">Low Stock Alerts</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="card mb-4 border-0 shadow-sm">
+            <div class="card-body">
+                <h2 class="h5 mb-3">Quick Actions</h2>
+                <div class="row g-3">
+                    <div class="col-lg-3 col-md-6">
+                        <a href="{% url 'billing:pos' %}" class="btn btn-outline-primary w-100 p-3 text-decoration-none">
+                            <div class="fs-3 mb-2">🛒</div>
+                            <span>New Bill</span>
+                        </a>
+                    </div>
+                    <div class="col-lg-3 col-md-6">
+                        <a href="{% url 'products:add' %}" class="btn btn-outline-success w-100 p-3 text-decoration-none">
+                            <div class="fs-3 mb-2">📦</div>
+                            <span>Add Product</span>
+                        </a>
+                    </div>
+                    <div class="col-lg-3 col-md-6">
+                        <a href="{% url 'reports:dashboard' %}" class="btn btn-outline-info w-100 p-3 text-decoration-none">
+                            <div class="fs-3 mb-2">📊</div>
+                            <span>View Reports</span>
+                        </a>
+                    </div>
+                    <div class="col-lg-3 col-md-6">
+                        <a href="{% url 'ai_insights:dashboard' %}" class="btn btn-outline-warning w-100 p-3 text-decoration-none">
+                            <div class="fs-3 mb-2">🤖</div>
+                            <span>AI Insights</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Dashboard Grid -->
+        <div class="row g-4 mb-4">
+            <div class="col-lg-8">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-body">
+                        <h3 class="h6 mb-3">📈 Sales Overview (Last 30 Days)</h3>
+                        <div class="chart-container" style="height: 300px;">
+                            <canvas id="salesChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-lg-4">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-body">
+                        <h3 class="h6 mb-3">Recent Activity</h3>
+                        <div class="activity-list">
+                            {% if today_report.total_bills > 0 %}
+                            <div class="d-flex align-items-start mb-3">
+                                <div class="me-3 fs-5">✅</div>
+                                <div>
+                                    <p class="mb-1"><strong>{{ today_report.total_bills }} bills</strong> created today</p>
+                                    <small class="text-muted">Total sales: Rs. {{ today_report.total_sales|floatformat:0 }}</small>
+                                </div>
+                            </div>
+                            {% endif %}
+                            {% if low_stock_products %}
+                            <div class="d-flex align-items-start mb-3">
+                                <div class="me-3 fs-5">⚠️</div>
+                                <div>
+                                    <p class="mb-1"><strong>{{ low_stock_products|length }} products</strong> low on stock</p>
+                                    <small class="text-muted">Check inventory management</small>
+                                </div>
+                            </div>
+                            {% endif %}
+                            {% if top_products %}
+                            <div class="d-flex align-items-start mb-3">
+                                <div class="me-3 fs-5">🏆</div>
+                                <div>
+                                    <p class="mb-1"><strong>Top product:</strong> {{ top_products.0.product__name }}</p>
+                                    <small class="text-muted">{{ top_products.0.total_quantity }} units sold</small>
+                                </div>
+                            </div>
+                            {% endif %}
+                            {% if not today_report.total_bills and not low_stock_products %}
+                            <div class="d-flex align-items-start mb-3">
+                                <div class="me-3 fs-5">🎉</div>
+                                <div>
+                                    <p class="mb-1"><strong>Welcome to ShopCloud!</strong></p>
+                                    <small class="text-muted">Start by creating your first bill</small>
+                                </div>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Top Products & Low Stock -->
+        <div class="row g-4 mb-4">
+            <div class="col-lg-6">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-body">
+                        <h3 class="h6 mb-3">Top Products (Last 7 Days)</h3>
+                        {% if top_products %}
+                        <div class="list-group list-group-flush">
+                            {% for product in top_products %}
+                            <div class="list-group-item d-flex justify-content-between align-items-center px-0">
+                                <span>{{ product.product__name }}</span>
+                                <span class="badge bg-primary rounded-pill">{{ product.total_quantity }} sold</span>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        {% else %}
+                        <div class="text-center py-4">
+                            <div class="fs-1 mb-2">📦</div>
+                            <p class="text-muted">No sales data yet</p>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-6">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-body">
+                        <h3 class="h6 mb-3">Low Stock Alerts</h3>
+                        {% if low_stock_products %}
+                        <div class="list-group list-group-flush">
+                            {% for product in low_stock_products %}
+                            <div class="list-group-item d-flex justify-content-between align-items-center px-0">
+                                <span>{{ product.name }}</span>
+                                <span class="badge bg-danger rounded-pill">{{ product.stock }} left</span>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        {% else %}
+                        <div class="text-center py-4">
+                            <div class="fs-1 mb-2">✅</div>
+                            <p class="text-muted">All products in stock</p>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- AI Suggestions Panel -->
+        <div class="card border-0 shadow-sm">
+            <div class="card-body">
+                <h3 class="h6 mb-3">🤖 AI Suggestions</h3>
+                <div class="row g-3">
+                    {% if today_report.total_bills == 0 %}
+                    <div class="col-12">
+                        <div class="alert alert-info mb-0">
+                            <strong>Get Started:</strong> Create your first bill to start tracking sales and inventory.
+                        </div>
+                    </div>
+                    {% endif %}
+                    {% if low_stock_products %}
+                    <div class="col-12">
+                        <div class="alert alert-warning mb-0">
+                            <strong>Stock Alert:</strong> {{ low_stock_products|length }} products are running low. Consider restocking soon.
+                        </div>
+                    </div>
+                    {% endif %}
+                    {% if month_report.total_sales > 0 %}
+                    <div class="col-12">
+                        <div class="alert alert-success mb-0">
+                            <strong>Monthly Performance:</strong> Your total sales this month are Rs. {{ month_report.total_sales|floatformat:0 }}. Great progress!
+                        </div>
+                    </div>
+                    {% endif %}
+                    {% if not low_stock_products and today_report.total_bills > 0 %}
+                    <div class="col-12">
+                        <div class="alert alert-primary mb-0">
+                            <strong>Tip:</strong> Use barcode scanning for faster billing and inventory management.
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+{% endblock %}
+
+{% block dashboard_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+// Sales Chart
+fetch('/dashboard/api/chart-data/?type=daily_sales&days=30')
+    .then(response => response.json())
+    .then(data => {
+        const ctx = document.getElementById('salesChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: data.map(item => {
+                    const date = new Date(item.date);
+                    return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+                }),
+                datasets: [{
+                    label: 'Daily Sales (Rs.)',
+                    data: data.map(item => item.sales),
+                    borderColor: '#3b82f6',
+                    backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                    borderWidth: 2,
+                    fill: true,
+                    tension: 0.4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            callback: function(value) {
+                                return 'Rs. ' + value.toLocaleString();
+                            }
+                        }
+                    },
+                    x: {
+                        grid: {
+                            display: false
+                        }
+                    }
+                },
+                elements: {
+                    point: {
+                        radius: 4,
+                        hoverRadius: 6
+                    }
+                }
+            }
+        });
+    })
+    .catch(error => {
+        console.error('Error loading chart data:', error);
+        document.getElementById('salesChart').parentElement.innerHTML = 
+            '<div class="text-center py-4"><p>📈 Unable to load chart data</p><small class="text-muted">Please check your internet connection</small></div>';
+    });
+</script>
+{% endblock %}

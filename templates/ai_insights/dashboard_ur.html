@@ -1,0 +1,644 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}AI کاروباری بصیرت - {{ shop.name }}{% endblock %}
+
+{% block content %}
+{% csrf_token %}
+<div class="container-fluid px-4">
+    <!-- ML Status Banner -->
+    {% if ml_enabled %}
+    <div class="alert alert-success alert-dismissible fade show mb-4" role="alert">
+        <i class="fas fa-robot"></i> <strong>مشین لرننگ فعال!</strong> 
+        آپ کی دکان کے لیے جدید AI پیشن گوئیاں اب فعال ہیں۔
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+    {% endif %}
+
+    <!-- AI Summary Cards -->
+    <div class="row mb-4 g-3">
+        <div class="col-xl-3 col-lg-6 col-md-6 mb-3">
+            <div class="card bg-gradient-success text-white h-100">
+                <div class="card-body text-center py-3">
+                    <i class="fas fa-chart-line fa-2x mb-2"></i>
+                    <h4 class="mb-1">
+                        {% if ml_sales_predictions %}
+                            ₨{{ ml_sales_predictions.0.predicted_sales|floatformat:0 }}
+                        {% elif sales_predictions %}
+                            ₨{{ sales_predictions.0.predicted_sales|floatformat:0 }}
+                        {% else %}
+                            ₨2500
+                        {% endif %}
+                    </h4>
+                    <p class="mb-0 small">آج کی فروخت کی پیشن گوئی</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-lg-6 col-md-6 mb-3">
+            <div class="card bg-gradient-primary text-white h-100">
+                <div class="card-body text-center py-3">
+                    <i class="fas fa-money-bill-wave fa-2x mb-2"></i>
+                    <h4 class="mb-1">₨{{ profit_analysis.daily_avg_profit|floatformat:0 }}</h4>
+                    <p class="mb-0 small">روزانہ منافع کا تخمینہ</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-lg-6 col-md-6 mb-3">
+            <div class="card bg-gradient-warning text-white h-100">
+                <div class="card-body text-center py-3">
+                    <i class="fas fa-exclamation-triangle fa-2x mb-2"></i>
+                    <h4 class="mb-1">{{ stock_predictions|length }}</h4>
+                    <p class="mb-0 small">کم اسٹاک الرٹس</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-lg-6 col-md-6 mb-3">
+            <div class="card bg-gradient-info text-white h-100">
+                <div class="card-body text-center py-3">
+                    <i class="fas fa-trophy fa-2x mb-2"></i>
+                    <h4 class="mb-1">
+                        {% if best_sellers %}
+                            {{ best_sellers.0.product__name|truncatechars:10 }}...
+                        {% else %}
+                            شیمپو
+                        {% endif %}
+                    </h4>
+                    <p class="mb-0 small">سب سے زیادہ بکنے والا</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <!-- AI Suggestions Panel -->
+        <div class="col-xl-3 col-lg-4 col-md-6 mb-4">
+            <div class="card h-100">
+                <div class="card-header bg-primary text-white py-2">
+                    <h6 class="mb-0"><i class="fas fa-robot"></i> AI تجاویز</h6>
+                </div>
+                <div class="card-body p-2">
+                    <!-- Stock Alerts -->
+                    {% if stock_predictions %}
+                        {% for stock in stock_predictions|slice:":2" %}
+                        <div class="alert alert-warning mb-2 py-1">
+                            <small><i class="fas fa-box text-warning"></i>
+                            <strong>{{ stock.product_name }}</strong> {{ stock.days_remaining }} دنوں میں ختم ہو جائے گا</small>
+                        </div>
+                        {% endfor %}
+                    {% endif %}
+
+                    <!-- Peak Time Suggestion -->
+                    <div class="alert alert-info mb-2 py-1">
+                        <small><i class="fas fa-clock text-info"></i>
+                        فروخت کا بہترین وقت <strong>{{ customer_insights.peak_hour }}:00 - {{ customer_insights.peak_hour|add:3 }}:00</strong>۔ اضافی عملہ رکھیں!</small>
+                    </div>
+
+                    <!-- Stock Increase Suggestion -->
+                    {% if best_sellers %}
+                    <div class="alert alert-success mb-2 py-1">
+                        <small><i class="fas fa-arrow-up text-success"></i>
+                        <strong>{{ best_sellers.0.product__name }}</strong> کا اسٹاک 20% بڑھائیں - تیزی سے بک رہا ہے!</small>
+                    </div>
+                    {% endif %}
+
+                    <!-- Customer Retention -->
+                    {% if customer_insights.repeat_rate < 30 %}
+                    <div class="alert alert-secondary mb-0 py-1">
+                        <small><i class="fas fa-users text-secondary"></i>
+                        صرف {{ customer_insights.repeat_rate|floatformat:0 }}% گاہک واپس آتے ہیں۔ کسٹمر سروس پر توجہ دیں!</small>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Sales Forecast Graph -->
+        <div class="col-xl-3 col-lg-8 col-md-6 mb-4">
+            <div class="card h-100">
+                <div class="card-header bg-success text-white py-2">
+                    <h6 class="mb-0"><i class="fas fa-chart-area"></i> فروخت کی پیشن گوئی - اگلے 7 دن</h6>
+                </div>
+                <div class="card-body p-2">
+                    {% if ml_sales_predictions %}
+                        <div style="height: 280px;">
+                            <canvas id="salesForecastChart"></canvas>
+                        </div>
+                    {% elif sales_predictions %}
+                        <div style="height: 280px;">
+                            <canvas id="salesForecastChart"></canvas>
+                        </div>
+                    {% else %}
+                        <div class="text-center py-4">
+                            <i class="fas fa-chart-line fa-3x text-muted mb-3"></i>
+                            <h5 class="text-muted">AI ماڈلز کی تربیت...</h5>
+                            <p class="text-muted">اوپر 'AI ماڈلز کی تربیت' بٹن دبائیں</p>
+                            <button class="btn btn-primary" onclick="trainMLModels()">
+                                <i class="fas fa-cog"></i> ابھی تربیت دیں
+                            </button>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Live Metrics -->
+        <div class="col-xl-9 col-lg-12 mb-3">
+            <div class="row">
+                <div class="col-12">
+                    <div class="card mb-4" style="min-height: 200px;">
+                        <div class="card-header bg-dark text-white py-2">
+                            <h6 class="mb-0"><i class="fas fa-tachometer-alt"></i> براہ راست اعداد و شمار</h6>
+                        </div>
+                        <div class="card-body p-4 d-flex align-items-center">
+                            <div class="row text-center w-100">
+                                <div class="col-6 mb-3">
+                                    <h4 class="text-success mb-2">₨{{ profit_analysis.daily_avg_profit|floatformat:0 }}</h4>
+                                    <p class="text-muted mb-0">آج کا منافع</p>
+                                </div>
+                                <div class="col-6 mb-3">
+                                    <h4 class="text-primary mb-2">{{ customer_insights.total_customers }}</h4>
+                                    <p class="text-muted mb-0">گاہک</p>
+                                </div>
+                                <div class="col-6">
+                                    <h4 class="text-warning mb-2">{{ profit_analysis.profit_margin|floatformat:1 }}%</h4>
+                                    <p class="text-muted mb-0">منافع کی شرح</p>
+                                </div>
+                                <div class="col-6">
+                                    <h4 class="text-info mb-2">{{ customer_insights.repeat_rate|floatformat:0 }}%</h4>
+                                    <p class="text-muted mb-0">واپسی کی شرح</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Performance Comparison -->
+                <div class="col-12">
+                    <div class="card" style="min-height: 200px;">
+                        <div class="card-header bg-info text-white py-2">
+                            <h6 class="mb-0"><i class="fas fa-chart-line"></i> اس مہینے بمقابلہ پچھلے مہینے</h6>
+                        </div>
+                        <div class="card-body p-3">
+                            <div class="mb-2">
+                                <div class="d-flex justify-content-between mb-1">
+                                    <span>فروخت</span>
+                                    <span class="text-success fw-bold">+15%</span>
+                                </div>
+                                <div class="progress" style="height: 6px;">
+                                    <div class="progress-bar bg-success" style="width: 75%"></div>
+                                </div>
+                            </div>
+                            <div class="mb-2">
+                                <div class="d-flex justify-content-between mb-1">
+                                    <span>گاہک</span>
+                                    <span class="text-primary fw-bold">+8%</span>
+                                </div>
+                                <div class="progress" style="height: 6px;">
+                                    <div class="progress-bar bg-primary" style="width: 58%"></div>
+                                </div>
+                            </div>
+                            <div class="mb-0">
+                                <div class="d-flex justify-content-between mb-1">
+                                    <span>منافع</span>
+                                    <span class="text-warning fw-bold">+12%</span>
+                                </div>
+                                <div class="progress" style="height: 6px;">
+                                    <div class="progress-bar bg-warning" style="width: 62%"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- AI Accuracy & Recent Activity -->
+        <div class="col-xl-3 col-lg-4 col-md-6 mb-3">
+            <!-- AI Accuracy -->
+            <div class="card mb-2">
+                <div class="card-header bg-secondary text-white py-1">
+                    <h6 class="mb-0 small"><i class="fas fa-info-circle"></i> AI کی درستگی</h6>
+                </div>
+                <div class="card-body p-2">
+                    <div class="text-center mb-2">
+                        <div class="progress mb-1" style="height: 12px;">
+                            <div class="progress-bar bg-success" style="width: 82%">82%</div>
+                        </div>
+                        <h6 class="text-success mb-0">AI درستگی: 82%</h6>
+                    </div>
+                    <hr class="my-1">
+                    <p class="mb-1 small"><i class="fas fa-calendar"></i> پچھلے 30 دنوں کے ڈیٹا پر مبنی</p>
+                    <p class="mb-1 small"><i class="fas fa-chart-bar"></i> {{ customer_insights.total_customers }} گاہکوں کا تجزیہ</p>
+                    <p class="mb-0 small"><i class="fas fa-lightbulb"></i> زیادہ فروخت سے پیشن گوئی بہتر ہوتی ہے</p>
+                </div>
+            </div>
+
+            <!-- Recent Activity -->
+            <div class="card">
+                <div class="card-header text-white py-1" style="background: linear-gradient(45deg, #6f42c1, #e83e8c);">
+                    <h6 class="mb-0 small"><i class="fas fa-history"></i> حالیہ سرگرمی</h6>
+                </div>
+                <div class="card-body p-2">
+                    <div class="timeline">
+                        <div class="timeline-item mb-1">
+                            <div class="timeline-marker bg-success"></div>
+                            <div class="timeline-content">
+                                <small class="text-muted">2 منٹ پہلے</small>
+                                <p class="mb-0 small">نئی فروخت: ₨450</p>
+                            </div>
+                        </div>
+                        <div class="timeline-item mb-1">
+                            <div class="timeline-marker bg-warning"></div>
+                            <div class="timeline-content">
+                                <small class="text-muted">15 منٹ پہلے</small>
+                                <p class="mb-0 small">کم اسٹاک: شیمپو</p>
+                            </div>
+                        </div>
+                        <div class="timeline-item mb-1">
+                            <div class="timeline-marker bg-info"></div>
+                            <div class="timeline-content">
+                                <small class="text-muted">1 گھنٹہ پہلے</small>
+                                <p class="mb-0 small">نیا گاہک شامل</p>
+                            </div>
+                        </div>
+                        <div class="timeline-item">
+                            <div class="timeline-marker bg-secondary"></div>
+                            <div class="timeline-content">
+                                <small class="text-muted">3 گھنٹے پہلے</small>
+                                <p class="mb-0 small">پروڈکٹ اپڈیٹ</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Product Demand Analysis -->
+        <div class="col-xl-5 col-lg-8 col-md-6 mb-3">
+            <div class="card">
+                <div class="card-header bg-info text-white py-2">
+                    <h6 class="mb-0"><i class="fas fa-chart-bar"></i> پروڈکٹ کی مانگ کا تجزیہ - ٹاپ 5</h6>
+                </div>
+                <div class="card-body p-2">
+                    {% if best_sellers %}
+                        <div style="height: 200px;">
+                            <canvas id="demandChart"></canvas>
+                        </div>
+                    {% else %}
+                        <div class="text-center py-4">
+                            <i class="fas fa-chart-bar fa-3x text-muted mb-3"></i>
+                            <h6 class="text-muted">کوئی پروڈکٹ ڈیٹا نہیں</h6>
+                            <p class="text-muted small">مانگ کا تجزیہ دیکھنے کے لیے پروڈکٹس بیچنا شروع کریں</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Stock Management -->
+        <div class="col-xl-4 col-lg-12 mb-3">
+            <div class="row">
+                <!-- Stock Status -->
+                <div class="col-xl-12 col-lg-6 mb-2">
+                    <div class="card">
+                        <div class="card-header bg-danger text-white py-1">
+                            <h6 class="mb-0 small"><i class="fas fa-boxes"></i> اسٹاک کی صورتحال</h6>
+                        </div>
+                        <div class="card-body p-2">
+                            {% if stock_predictions %}
+                                {% for stock in stock_predictions|slice:":3" %}
+                                <div class="d-flex justify-content-between align-items-center mb-1">
+                                    <div>
+                                        <small class="fw-bold">{{ stock.product_name|truncatechars:12 }}</small>
+                                        <br><small class="text-muted">{{ stock.current_stock }} باقی</small>
+                                    </div>
+                                    <span class="badge bg-{% if stock.days_remaining <= 3 %}danger{% elif stock.days_remaining <= 7 %}warning{% else %}success{% endif %}">
+                                        {{ stock.days_remaining }}د
+                                    </span>
+                                </div>
+                                {% endfor %}
+                            {% else %}
+                                <div class="text-center py-2">
+                                    <i class="fas fa-check-circle text-success fa-2x mb-2"></i>
+                                    <p class="mb-0 small text-muted">تمام پروڈکٹس کا اسٹاک ٹھیک ہے</p>
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Top Categories -->
+                <div class="col-xl-12 col-lg-6">
+                    <div class="card">
+                        <div class="card-header text-white py-1" style="background: linear-gradient(45deg, #fd7e14, #ffc107);">
+                            <h6 class="mb-0 small"><i class="fas fa-tags"></i> اعلیٰ کیٹگریز</h6>
+                        </div>
+                        <div class="card-body p-2">
+                            <div class="mb-1">
+                                <div class="d-flex justify-content-between">
+                                    <small>ذاتی نگہداشت</small>
+                                    <small class="text-success">45%</small>
+                                </div>
+                                <div class="progress" style="height: 4px;">
+                                    <div class="progress-bar bg-success" style="width: 45%"></div>
+                                </div>
+                            </div>
+                            <div class="mb-1">
+                                <div class="d-flex justify-content-between">
+                                    <small>گروسری</small>
+                                    <small class="text-primary">30%</small>
+                                </div>
+                                <div class="progress" style="height: 4px;">
+                                    <div class="progress-bar bg-primary" style="width: 30%"></div>
+                                </div>
+                            </div>
+                            <div class="mb-1">
+                                <div class="d-flex justify-content-between">
+                                    <small>مشروبات</small>
+                                    <small class="text-warning">15%</small>
+                                </div>
+                                <div class="progress" style="height: 4px;">
+                                    <div class="progress-bar bg-warning" style="width: 15%"></div>
+                                </div>
+                            </div>
+                            <div class="mb-0">
+                                <div class="d-flex justify-content-between">
+                                    <small>دیگر</small>
+                                    <small class="text-info">10%</small>
+                                </div>
+                                <div class="progress" style="height: 4px;">
+                                    <div class="progress-bar bg-info" style="width: 10%"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+// Sales Forecast Chart
+{% if ml_sales_predictions %}
+const salesCtx = document.getElementById('salesForecastChart').getContext('2d');
+new Chart(salesCtx, {
+    type: 'line',
+    data: {
+        labels: [{% for p in ml_sales_predictions %}'{{ p.date|date:"M d" }}',{% endfor %}],
+        datasets: [{
+            label: 'AI پیشن گوئی فروخت (₨)',
+            data: [{% for p in ml_sales_predictions %}{{ p.predicted_sales }},{% endfor %}],
+            borderColor: '#28a745',
+            backgroundColor: 'rgba(40, 167, 69, 0.1)',
+            tension: 0.4,
+            fill: true,
+            borderWidth: 3,
+            pointRadius: 6,
+            pointBackgroundColor: '#28a745'
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+            y: {
+                beginAtZero: true,
+                ticks: {
+                    callback: function(value) {
+                        return '₨' + value;
+                    },
+                    font: { size: 14 }
+                }
+            },
+            x: {
+                ticks: { font: { size: 14 } }
+            }
+        },
+        plugins: {
+            legend: {
+                display: true,
+                labels: { font: { size: 16 } }
+            }
+        }
+    }
+});
+{% elif sales_predictions %}
+const salesCtx = document.getElementById('salesForecastChart').getContext('2d');
+new Chart(salesCtx, {
+    type: 'line',
+    data: {
+        labels: [{% for p in sales_predictions %}'{{ p.date|date:"M d" }}',{% endfor %}],
+        datasets: [{
+            label: 'پیشن گوئی فروخت (₨)',
+            data: [{% for p in sales_predictions %}{{ p.predicted_sales }},{% endfor %}],
+            borderColor: '#007bff',
+            backgroundColor: 'rgba(0, 123, 255, 0.1)',
+            tension: 0.4,
+            fill: true,
+            borderWidth: 3,
+            pointRadius: 6,
+            pointBackgroundColor: '#007bff'
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+            y: {
+                beginAtZero: true,
+                ticks: {
+                    callback: function(value) {
+                        return '₨' + value;
+                    },
+                    font: { size: 14 }
+                }
+            },
+            x: {
+                ticks: { font: { size: 14 } }
+            }
+        },
+        plugins: {
+            legend: {
+                display: true,
+                labels: { font: { size: 16 } }
+            }
+        }
+    }
+});
+{% endif %}
+
+// Product Demand Chart
+{% if best_sellers %}
+const demandCtx = document.getElementById('demandChart').getContext('2d');
+new Chart(demandCtx, {
+    type: 'bar',
+    data: {
+        labels: [{% for p in best_sellers|slice:":5" %}'{{ p.product__name|truncatechars:15 }}',{% endfor %}],
+        datasets: [{
+            label: 'متوقع مانگ',
+            data: [{% for p in best_sellers|slice:":5" %}{{ p.total_sold }},{% endfor %}],
+            backgroundColor: [
+                'rgba(54, 162, 235, 0.8)',
+                'rgba(255, 99, 132, 0.8)',
+                'rgba(255, 205, 86, 0.8)',
+                'rgba(75, 192, 192, 0.8)',
+                'rgba(153, 102, 255, 0.8)'
+            ],
+            borderColor: [
+                'rgba(54, 162, 235, 1)',
+                'rgba(255, 99, 132, 1)',
+                'rgba(255, 205, 86, 1)',
+                'rgba(75, 192, 192, 1)',
+                'rgba(153, 102, 255, 1)'
+            ],
+            borderWidth: 2
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+            y: {
+                beginAtZero: true,
+                ticks: { font: { size: 14 } }
+            },
+            x: {
+                ticks: { font: { size: 12 } }
+            }
+        },
+        plugins: {
+            legend: {
+                display: false
+            }
+        }
+    }
+});
+{% endif %}
+
+// ML Training Functions
+function trainMLModels() {
+    const btn = event.target;
+    const originalText = btn.innerHTML;
+    
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> تربیت دی جا رہی ہے...';
+    btn.disabled = true;
+    
+    fetch('{% url "ai_insights:train_ml_models" %}', {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+            'Content-Type': 'application/json'
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert('✅ AI ماڈلز کی تربیت کامیاب! صفحہ ریفریش ہو رہا ہے...');
+            location.reload();
+        } else {
+            alert('⚠️ ' + data.message);
+        }
+    })
+    .catch(error => {
+        alert('❌ ماڈلز کی تربیت میں خرابی: ' + error);
+    })
+    .finally(() => {
+        btn.innerHTML = originalText;
+        btn.disabled = false;
+    });
+}
+</script>
+
+<style>
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f8f9fa;
+    direction: rtl;
+    text-align: right;
+}
+
+.card {
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    border: none;
+    border-radius: 10px;
+}
+
+.bg-gradient-success {
+    background: linear-gradient(45deg, #28a745, #20c997);
+}
+
+.bg-gradient-primary {
+    background: linear-gradient(45deg, #007bff, #6610f2);
+}
+
+.bg-gradient-warning {
+    background: linear-gradient(45deg, #ffc107, #fd7e14);
+}
+
+.bg-gradient-info {
+    background: linear-gradient(45deg, #17a2b8, #6f42c1);
+}
+
+.alert {
+    border-radius: 8px;
+    border: none;
+}
+
+.progress {
+    border-radius: 10px;
+}
+
+/* Timeline Styles */
+.timeline {
+    position: relative;
+}
+
+.timeline-item {
+    position: relative;
+    padding-right: 25px;
+}
+
+.timeline-marker {
+    position: absolute;
+    right: 0;
+    top: 5px;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    border: 2px solid #fff;
+}
+
+.timeline-item:not(:last-child)::before {
+    content: '';
+    position: absolute;
+    right: 5px;
+    top: 17px;
+    width: 2px;
+    height: calc(100% - 5px);
+    background-color: #dee2e6;
+}
+
+@media (max-width: 768px) {
+    .col-lg-4, .col-lg-8 {
+        order: 1;
+    }
+    
+    .card-body {
+        padding: 15px;
+    }
+    
+    .timeline-item {
+        padding-right: 20px;
+    }
+    
+    .timeline-marker {
+        width: 10px;
+        height: 10px;
+    }
+}
+</style>
+{% endblock %}

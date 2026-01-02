@@ -1,0 +1,80 @@
+{% extends 'dashboard_base.html' %}
+
+{% block title %}بل کی تاریخ{% endblock %}
+
+{% block dashboard_content %}
+<div class="container mt-4" style="direction: rtl; font-family: 'Noto Nastaliq Urdu', Arial, sans-serif;">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>بل کی تاریخ</h2>
+        <a href="{% url 'billing:pos' %}" class="btn btn-primary">نیا بل</a>
+    </div>
+    
+    <!-- Search and Filter Section -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <form method="get" class="d-flex gap-2 flex-wrap">
+                <input type="text" name="search" value="{{ search }}" placeholder="بل نمبر، کسٹمر کا نام یا فون سے تلاش کریں..." class="form-control" style="flex: 2; min-width: 200px;">
+                <input type="date" name="date_from" value="{{ date_from }}" class="form-control" style="flex: 1; min-width: 150px;" title="شروع کی تاریخ">
+                <input type="date" name="date_to" value="{{ date_to }}" class="form-control" style="flex: 1; min-width: 150px;" title="اختتام کی تاریخ">
+                <button type="submit" class="btn btn-primary">تلاش</button>
+                <a href="{% url 'billing:bill_history' %}" class="btn btn-secondary">صاف کریں</a>
+            </form>
+        </div>
+    </div>
+
+    <!-- Summary Cards -->
+    {% if bills %}
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <div class="card bg-primary text-white">
+                <div class="card-body text-center">
+                    <h4>{{ total_bills }}</h4>
+                    <p class="mb-0">کل بلز</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card bg-success text-white">
+                <div class="card-body text-center">
+                    <h4>Rs. {{ total_amount|floatformat:0 }}</h4>
+                    <p class="mb-0">کل رقم</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+    
+    <div class="table-responsive">
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>بل نمبر</th>
+                    <th>تاریخ</th>
+                    <th>کسٹمر</th>
+                    <th>کل</th>
+                    <th>ادائیگی</th>
+                    <th>عمل</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for bill in bills %}
+                <tr>
+                    <td>{{ bill.bill_number }}</td>
+                    <td>{{ bill.date|date:"d M Y, g:i A" }}</td>
+                    <td>{{ bill.customer_name|default:"واک ان" }}</td>
+                    <td>Rs. {{ bill.total }}</td>
+                    <td><span class="badge bg-info">{{ bill.get_payment_type_display }}</span></td>
+                    <td>
+                        <a href="{% url 'billing:bill_detail' bill.id %}" class="btn btn-sm btn-outline-primary">دیکھیں</a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="6" class="text-center">کوئی بل نہیں ملا</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,225 @@
+{% extends 'dashboard_base.html' %}
+{% load static %}
+
+{% block title %}Price Recommendations - {{ shop.name }}{% endblock %}
+
+{% block dashboard_content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2><i class="fas fa-tag text-success"></i> Price Recommendations</h2>
+                <a href="{% url 'ai_insights:dashboard' %}" class="btn btn-outline-secondary">
+                    <i class="fas fa-arrow-left"></i> Back to AI Insights
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Summary Cards -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card bg-success text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h6>Increase Price</h6>
+                            <h4>{{ increase_count }}</h4>
+                        </div>
+                        <i class="fas fa-arrow-up fa-2x"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-warning text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h6>Decrease Price</h6>
+                            <h4>{{ decrease_count }}</h4>
+                        </div>
+                        <i class="fas fa-arrow-down fa-2x"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-info text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h6>Optimal Price</h6>
+                            <h4>{{ optimal_count }}</h4>
+                        </div>
+                        <i class="fas fa-check fa-2x"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-primary text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h6>Potential Profit</h6>
+                            <h4>₨{{ potential_profit|floatformat:0 }}</h4>
+                        </div>
+                        <i class="fas fa-chart-line fa-2x"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Price Recommendations Table -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5><i class="fas fa-list"></i> Product Price Recommendations</h5>
+                </div>
+                <div class="card-body">
+                    {% if recommendations %}
+                        <div class="table-responsive">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>Product</th>
+                                        <th>Current Price</th>
+                                        <th>Recommended Price</th>
+                                        <th>Change</th>
+                                        <th>Reason</th>
+                                        <th>Confidence</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for rec in recommendations %}
+                                    <tr>
+                                        <td>
+                                            <strong>{{ rec.product.name }}</strong>
+                                            <small class="d-block text-muted">{{ rec.product.category.name }}</small>
+                                        </td>
+                                        <td>₨{{ rec.current_price|floatformat:0 }}</td>
+                                        <td>
+                                            <strong class="{% if rec.recommended_price > rec.current_price %}text-success{% elif rec.recommended_price < rec.current_price %}text-warning{% else %}text-info{% endif %}">
+                                                ₨{{ rec.recommended_price|floatformat:0 }}
+                                            </strong>
+                                        </td>
+                                        <td>
+                                            {% if rec.recommended_price > rec.current_price %}
+                                                <span class="badge badge-success">
+                                                    <i class="fas fa-arrow-up"></i> +₨{{ rec.price_difference|floatformat:0 }}
+                                                </span>
+                                            {% elif rec.recommended_price < rec.current_price %}
+                                                <span class="badge badge-warning">
+                                                    <i class="fas fa-arrow-down"></i> -₨{{ rec.price_difference|floatformat:0 }}
+                                                </span>
+                                            {% else %}
+                                                <span class="badge badge-info">
+                                                    <i class="fas fa-check"></i> Optimal
+                                                </span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            <small>{{ rec.reason }}</small>
+                                        </td>
+                                        <td>
+                                            <div class="progress" style="height: 20px;">
+                                                <div class="progress-bar {% if rec.confidence >= 80 %}bg-success{% elif rec.confidence >= 60 %}bg-warning{% else %}bg-danger{% endif %}" 
+                                                     role="progressbar" style="width: {{ rec.confidence }}%">
+                                                    {{ rec.confidence|floatformat:0 }}%
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            {% if rec.recommended_price != rec.current_price %}
+                                                <button class="btn btn-sm btn-primary" onclick="applyPrice({{ rec.product.id }}, {{ rec.recommended_price }})">
+                                                    <i class="fas fa-check"></i> Apply
+                                                </button>
+                                            {% else %}
+                                                <span class="text-muted">No change needed</span>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <div class="text-center py-5">
+                            <i class="fas fa-tag fa-3x text-muted mb-3"></i>
+                            <h5 class="text-muted">No Price Recommendations Available</h5>
+                            <p class="text-muted">AI is analyzing your sales data to generate price recommendations.</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Pricing Tips -->
+    <div class="row mt-4">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h6><i class="fas fa-lightbulb text-warning"></i> Pricing Tips</h6>
+                </div>
+                <div class="card-body">
+                    <ul class="list-unstyled">
+                        <li class="mb-2"><i class="fas fa-check-circle text-success"></i> Monitor competitor prices regularly</li>
+                        <li class="mb-2"><i class="fas fa-check-circle text-success"></i> Consider seasonal demand patterns</li>
+                        <li class="mb-2"><i class="fas fa-check-circle text-success"></i> Test price changes gradually</li>
+                        <li class="mb-2"><i class="fas fa-check-circle text-success"></i> Track customer response to price changes</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h6><i class="fas fa-chart-bar text-info"></i> Market Analysis</h6>
+                </div>
+                <div class="card-body">
+                    <p><strong>Market Trend:</strong> <span class="text-success">Stable</span></p>
+                    <p><strong>Demand Level:</strong> <span class="text-info">Moderate</span></p>
+                    <p><strong>Competition:</strong> <span class="text-warning">High</span></p>
+                    <p><strong>Recommendation:</strong> Focus on value-based pricing</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% csrf_token %}
+<script>
+function applyPrice(productId, newPrice) {
+    if (confirm(`Are you sure you want to update the price to ₨${newPrice}?`)) {
+        fetch('/ai-insights/apply-price/', {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                product_id: productId,
+                new_price: newPrice
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert('Price updated successfully!');
+                location.reload();
+            } else {
+                alert('Error updating price: ' + data.error);
+            }
+        })
+        .catch(error => {
+            alert('Error: ' + error);
+        });
+    }
+}
+</script>
+{% endblock %}

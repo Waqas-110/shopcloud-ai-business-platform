@@ -1,0 +1,83 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}ShopCloud - Apki Shop, Aapke Haath Mein{% endblock %}
+
+{% block content %}
+<section class="hero">
+    <div class="container-fluid">
+        <div class="row align-items-center min-vh-75">
+            <div class="col-lg-6 col-md-12 text-center text-lg-start">
+                <div class="d-flex align-items-center justify-content-center justify-content-lg-start gap-3 mb-4">
+                    <img src="{% static 'images/logo.svg' %}" alt="ShopCloud Logo" class="img-fluid" style="height: 60px;">
+                </div>
+                <h1 class="display-4 fw-bold mb-3">ShopCloud</h1>
+                <h2 class="h3 mb-4 text-muted">Apki Shop, Aapke Haath Mein</h2>
+                <p class="lead mb-4">Pakistan ki pehli FREE cloud-based POS system. Apni shop ko digital banayein, sales badhayein, aur AI ke saath smart decisions lein.</p>
+                <div class="d-flex flex-column flex-sm-row gap-3 justify-content-center justify-content-lg-start">
+                    <a href="{% url 'users:signup' %}" class="btn btn-primary btn-lg px-4">Free Mein Start Karein</a>
+                    <a href="{% url 'landing:features' %}" class="btn btn-outline-secondary btn-lg px-4">Features Dekhein</a>
+                </div>
+            </div>
+            <div class="col-lg-6 col-md-12 text-center mt-5 mt-lg-0">
+                <div class="mockup-phone mx-auto">
+                    <div class="screen">
+                        <div class="pos-demo">
+                            <div class="demo-header">ShopCloud POS</div>
+                            <div class="demo-items">
+                                <div class="demo-item">Pepsi 250ml - Rs.50</div>
+                                <div class="demo-item">Chips - Rs.30</div>
+                                <div class="demo-total">Total: Rs.80</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="features-preview py-5">
+    <div class="container">
+        <h2 class="text-center display-5 mb-5">Kyun Choose Karein ShopCloud?</h2>
+        <div class="row g-4">
+            <div class="col-lg-3 col-md-6">
+                <div class="feature-card h-100 text-center p-4 border rounded-3 bg-white shadow-sm">
+                    <div class="feature-icon fs-1 mb-3">📱</div>
+                    <h3 class="h5 mb-3">Mobile Friendly</h3>
+                    <p class="text-muted">Kisi bhi phone ya tablet pe chalayein</p>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6">
+                <div class="feature-card h-100 text-center p-4 border rounded-3 bg-white shadow-sm">
+                    <div class="feature-icon fs-1 mb-3">💰</div>
+                    <h3 class="h5 mb-3">Bilkul FREE</h3>
+                    <p class="text-muted">Koi monthly fee nahi, lifetime free</p>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6">
+                <div class="feature-card h-100 text-center p-4 border rounded-3 bg-white shadow-sm">
+                    <div class="feature-icon fs-1 mb-3">🤖</div>
+                    <h3 class="h5 mb-3">AI Insights</h3>
+                    <p class="text-muted">Smart suggestions aur sales predictions</p>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6">
+                <div class="feature-card h-100 text-center p-4 border rounded-3 bg-white shadow-sm">
+                    <div class="feature-icon fs-1 mb-3">📊</div>
+                    <h3 class="h5 mb-3">Reports & Analytics</h3>
+                    <p class="text-muted">Daily, weekly, monthly sales reports</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="cta bg-primary text-white py-5">
+    <div class="container text-center">
+        <h2 class="display-5 mb-3">Aaj Hi Shuru Karein!</h2>
+        <p class="lead mb-4">Sirf 2 minute mein setup complete karein</p>
+        <a href="{% url 'users:signup' %}" class="btn btn-light btn-lg px-5">Free Account Banayein</a>
+    </div>
+</section>
+{% endblock %}

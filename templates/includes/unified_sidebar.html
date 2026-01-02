@@ -1,0 +1,143 @@
+{% load static %}
+<!-- UNIFIED SIDEBAR - Same design for all pages -->
+<nav class="sidebar" id="dashboardSidebar">
+    <div class="sidebar-header">
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px;">
+            <div style="display: flex; align-items: center; gap: 8px;">
+                <img src="{% static 'images/logo-icon.svg' %}" alt="ShopCloud" style="height: 32px; width: auto; filter: brightness(0) invert(1);">
+                <h3>ShopCloud</h3>
+            </div>
+            <button class="sidebar-toggle" onclick="toggleSidebar()" title="Hide/Show Sidebar">
+                <span id="sidebarToggleIcon">«</span>
+            </button>
+        </div>
+        <h4>{{ user.shop.name }}</h4>
+        <p>
+            {% if current_language == 'ur' or request.session.language == 'ur' or '/ur/' in request.path %}
+                خوش آمدید، {{ user.first_name }}!
+            {% else %}
+                Welcome, {{ user.first_name }}!
+            {% endif %}
+        </p>
+        
+        <!-- Language Switcher -->
+        <div class="language-switcher">
+            <a href="{% url 'switch_language' %}?lang=ur{% if request.get_full_path %}&next={{ request.get_full_path|urlencode }}{% endif %}" 
+               class="{% if current_language == 'ur' or request.session.language == 'ur' or '/ur/' in request.path %}active{% endif %}">
+                اردو
+            </a>
+            <a href="{% url 'switch_language' %}?lang=en{% if request.get_full_path %}&next={{ request.get_full_path|urlencode }}{% endif %}" 
+               class="{% if current_language == 'en' or request.session.language == 'en' or not current_language %}active{% endif %}">
+                EN
+            </a>
+        </div>
+    </div>
+    
+    <ul class="sidebar-menu">
+        {% if current_language == 'ur' or request.session.language == 'ur' or '/ur/' in request.path %}
+            <li><a href="{% url 'dashboard:main' %}" {% if request.resolver_match.url_name == 'main' %}class="active"{% endif %}>
+                <i>📊</i> ڈیش بورڈ
+            </a></li>
+            <li><a href="{% url 'products:list' %}" {% if 'products' in request.resolver_match.namespace and request.resolver_match.url_name != 'categories' %}class="active"{% endif %}>
+                <i>📦</i> مصنوعات
+            </a></li>
+            <li><a href="{% url 'products:categories' %}" {% if request.resolver_match.url_name == 'categories' %}class="active"{% endif %}>
+                <i>🏷️</i> اقسام
+            </a></li>
+            <li><a href="{% url 'billing:pos' %}" {% if 'billing' in request.resolver_match.namespace and request.resolver_match.url_name != 'bills_list' %}class="active"{% endif %}>
+                <i>🛒</i> POS/بلنگ
+            </a></li>
+            <li><a href="{% url 'billing:bills_list' %}" {% if request.resolver_match.url_name == 'bills_list' %}class="active"{% endif %}>
+                <i>📋</i> بلز کی تاریخ
+            </a></li>
+            <li><a href="{% url 'customers:list' %}" {% if 'customers' in request.resolver_match.namespace %}class="active"{% endif %}>
+                <i>👥</i> کسٹمرز
+            </a></li>
+            <li><a href="{% url 'reports:dashboard' %}" {% if 'reports' in request.resolver_match.namespace %}class="active"{% endif %}>
+                <i>📈</i> رپورٹس
+            </a></li>
+            <li><a href="{% url 'ai_insights:dashboard' %}" {% if 'ai_insights' in request.resolver_match.namespace %}class="active"{% endif %}>
+                <i>🤖</i> AI بصیرت
+            </a></li>
+            <li><a href="{% url 'users:profile' %}" {% if request.resolver_match.url_name == 'profile' %}class="active"{% endif %}>
+                <i>⚙️</i> ترتیبات
+            </a></li>
+            {% if user.is_superuser %}
+            <li><a href="{% url 'users:admin_accounts' %}" {% if request.resolver_match.url_name == 'admin_accounts' %}class="active"{% endif %}>
+                <i>🔐</i> ایڈمن پینل
+            </a></li>
+            {% endif %}
+            <li><a href="{% url 'users:logout' %}">
+                <i>🚪</i> لاگ آؤٹ
+            </a></li>
+        {% else %}
+            <li><a href="{% url 'dashboard:main' %}" {% if request.resolver_match.url_name == 'main' %}class="active"{% endif %}>
+                <i>📊</i> Dashboard
+            </a></li>
+            <li><a href="{% url 'products:list' %}" {% if 'products' in request.resolver_match.namespace and request.resolver_match.url_name != 'categories' %}class="active"{% endif %}>
+                <i>📦</i> Products
+            </a></li>
+            <li><a href="{% url 'products:categories' %}" {% if request.resolver_match.url_name == 'categories' %}class="active"{% endif %}>
+                <i>🏷️</i> Categories
+            </a></li>
+            <li><a href="{% url 'billing:pos' %}" {% if 'billing' in request.resolver_match.namespace and request.resolver_match.url_name != 'bills_list' %}class="active"{% endif %}>
+                <i>🛒</i> POS/Billing
+            </a></li>
+            <li><a href="{% url 'billing:bills_list' %}" {% if request.resolver_match.url_name == 'bills_list' %}class="active"{% endif %}>
+                <i>📋</i> Bills History
+            </a></li>
+            <li><a href="{% url 'customers:list' %}" {% if 'customers' in request.resolver_match.namespace %}class="active"{% endif %}>
+                <i>👥</i> Customers
+            </a></li>
+            <li><a href="{% url 'reports:dashboard' %}" {% if 'reports' in request.resolver_match.namespace %}class="active"{% endif %}>
+                <i>📈</i> Reports
+            </a></li>
+            <li><a href="{% url 'ai_insights:dashboard' %}" {% if 'ai_insights' in request.resolver_match.namespace %}class="active"{% endif %}>
+                <i>🤖</i> AI Insights
+            </a></li>
+            <li><a href="{% url 'users:profile' %}" {% if request.resolver_match.url_name == 'profile' %}class="active"{% endif %}>
+                <i>⚙️</i> Settings
+            </a></li>
+            {% if user.is_superuser %}
+            <li><a href="{% url 'users:admin_accounts' %}" {% if request.resolver_match.url_name == 'admin_accounts' %}class="active"{% endif %}>
+                <i>🔐</i> Admin Panel
+            </a></li>
+            {% endif %}
+            <li><a href="{% url 'users:logout' %}">
+                <i>🚪</i> Logout
+            </a></li>
+        {% endif %}
+    </ul>
+</nav>
+
+<script>
+// Unified Sidebar JavaScript
+document.addEventListener('DOMContentLoaded', function() {
+    const sidebar = document.getElementById('dashboardSidebar');
+    const mainContent = document.getElementById('mainContent');
+    
+    // Ensure sidebar is always visible
+    if (sidebar) {
+        sidebar.style.display = 'block';
+        sidebar.style.visibility = 'visible';
+    }
+});
+
+function toggleSidebar() {
+    const sidebar = document.getElementById('dashboardSidebar');
+    const mainContent = document.getElementById('mainContent');
+    const icon = document.getElementById('sidebarToggleIcon');
+    
+    if (sidebar && mainContent && icon) {
+        if (sidebar.classList.contains('hidden')) {
+            sidebar.classList.remove('hidden');
+            mainContent.classList.remove('expanded');
+            icon.textContent = '«';
+        } else {
+            sidebar.classList.add('hidden');
+            mainContent.classList.add('expanded');
+            icon.textContent = '»';
+        }
+    }
+}
+</script>

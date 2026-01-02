@@ -1,0 +1,288 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Features - ShopCloud{% endblock %}
+
+{% block extra_css %}
+<style>
+.features-hero {
+    background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+    color: white;
+    padding: 100px 20px;
+    text-align: center;
+}
+
+.features-hero h1 {
+    font-size: 3.5rem;
+    font-weight: 800;
+    margin-bottom: 20px;
+}
+
+.features-hero p {
+    font-size: 1.5rem;
+    opacity: 0.95;
+}
+
+.features-detailed {
+    padding: 100px 20px;
+    background: #f9fafb;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.features-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 30px;
+    margin-top: 50px;
+}
+
+.feature-item {
+    background: white;
+    padding: 40px 30px;
+    border-radius: 20px;
+    text-align: center;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    transition: all 0.3s ease;
+    border: 2px solid transparent;
+}
+
+.feature-item:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+    border-color: #2563eb;
+}
+
+.feature-icon {
+    font-size: 4.5rem;
+    margin-bottom: 25px;
+    display: block;
+}
+
+.feature-item h3 {
+    font-size: 1.8rem;
+    margin-bottom: 15px;
+    color: #1f2937;
+    font-weight: 700;
+}
+
+.feature-item p {
+    color: #6b7280;
+    line-height: 1.8;
+    font-size: 1.1rem;
+}
+
+.cta-section {
+    padding: 100px 20px;
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    color: white;
+    text-align: center;
+}
+
+.cta-section h2 {
+    font-size: 3rem;
+    margin-bottom: 20px;
+    font-weight: 800;
+}
+
+.cta-section p {
+    font-size: 1.3rem;
+    margin-bottom: 40px;
+    opacity: 0.95;
+}
+
+.btn {
+    display: inline-block;
+    padding: 15px 35px;
+    border-radius: 50px;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 1.1rem;
+    transition: all 0.3s ease;
+    border: none;
+    cursor: pointer;
+}
+
+.btn-primary {
+    background: white;
+    color: #10b981;
+    box-shadow: 0 4px 15px rgba(255, 255, 255, 0.3);
+}
+
+.btn-primary:hover {
+    background: #f3f4f6;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(255, 255, 255, 0.4);
+}
+
+.btn-large {
+    padding: 20px 50px;
+    font-size: 1.3rem;
+}
+
+.stats-bar {
+    background: white;
+    padding: 60px 20px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 40px;
+    text-align: center;
+}
+
+.stat-item h3 {
+    font-size: 3.5rem;
+    color: #2563eb;
+    margin-bottom: 10px;
+    font-weight: 800;
+}
+
+.stat-item p {
+    font-size: 1.2rem;
+    color: #6b7280;
+    font-weight: 600;
+}
+
+@media (max-width: 768px) {
+    .features-hero h1 {
+        font-size: 2.5rem;
+    }
+    
+    .features-hero p {
+        font-size: 1.2rem;
+    }
+    
+    .features-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .cta-section h2 {
+        font-size: 2.2rem;
+    }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<section class="features-hero">
+    <div class="container">
+        <h1>ShopCloud Features</h1>
+        <p>پاکستان کی سب سے جدید اور مفت POS سسٹم</p>
+    </div>
+</section>
+
+<section class="stats-bar">
+    <div class="container">
+        <div class="stats-grid">
+            <div class="stat-item">
+                <h3>100%</h3>
+                <p>مفت</p>
+            </div>
+            <div class="stat-item">
+                <h3>24/7</h3>
+                <p>دستیابی</p>
+            </div>
+            <div class="stat-item">
+                <h3>∞</h3>
+                <p>بلا محدود</p>
+            </div>
+            <div class="stat-item">
+                <h3>AI</h3>
+                <p>ذہین تجزیہ</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="features-detailed">
+    <div class="container">
+        <div class="features-grid">
+            <div class="feature-item">
+                <div class="feature-icon">📱</div>
+                <h3>موبائل فرینڈلی</h3>
+                <p>کسی بھی اسمارٹ فون، ٹیبلٹ یا کمپیوٹر پر بہترین کام کرتا ہے۔ انٹرنیٹ سست ہو یا تیز، ShopCloud ہر جگہ کام کرتا ہے۔</p>
+            </div>
+            
+            <div class="feature-item">
+                <div class="feature-icon">💰</div>
+                <h3>بالکل مفت</h3>
+                <p>کوئی ماہانہ فیس، سیٹ اپ چارجز یا پوشیدہ اخراجات نہیں۔ لائف ٹائم مفت سروس بلا محدود بلز اور مصنوعات کے ساتھ۔</p>
+            </div>
+            
+            <div class="feature-item">
+                <div class="feature-icon">🛒</div>
+                <h3>تیز POS سسٹم</h3>
+                <p>بارکوڈ اسکیننگ، فوری بلنگ، خودکار حساب کتاب اور فوری بل جنریشن۔ پیشہ ورانہ بلز پرنٹ کریں یا واٹس ایپ پر بھیجیں۔</p>
+            </div>
+            
+            <div class="feature-item">
+                <div class="feature-icon">📊</div>
+                <h3>سیلز تجزیہ</h3>
+                <p>روزانہ، ہفتہ وار، ماہانہ سیلز رپورٹس۔ بہترین فروخت ہونے والی مصنوعات، منافع کا تجزیہ اور کاروباری بصیرت ایک کلک میں۔</p>
+            </div>
+            
+            <div class="feature-item">
+                <div class="feature-icon">🤖</div>
+                <h3>AI تجاویز</h3>
+                <p>انوینٹری مینجمنٹ، قیمت کی بہتری اور سیلز میں اضافے کے لیے ذہین مشورے۔ AI آپ کو کاروبار بڑھانے میں مدد کرتا ہے۔</p>
+            </div>
+            
+            <div class="feature-item">
+                <div class="feature-icon">📦</div>
+                <h3>انوینٹری مینجمنٹ</h3>
+                <p>اسٹاک ٹریکنگ، کم اسٹاک الرٹس، مصنوعات کی اقسام اور خودکار دوبارہ آرڈر کی تجاویز۔ کبھی اسٹاک ختم نہیں ہوگا۔</p>
+            </div>
+            
+            <div class="feature-item">
+                <div class="feature-icon">📄</div>
+                <h3>بل جنریشن</h3>
+                <p>پیشہ ورانہ PDF بلز، واٹس ایپ شیئرنگ، ای میل بھیجنا۔ پرنٹ کریں یا ڈیجیٹل طور پر شیئر کریں۔</p>
+            </div>
+            
+            <div class="feature-item">
+                <div class="feature-icon">🏷️</div>
+                <h3>قسم مینجمنٹ</h3>
+                <p>مصنوعات کو اقسام کے لحاظ سے منظم کریں۔ آسان فلٹرنگ اور تلاش۔ بڑی تعداد میں درآمد/برآمد۔</p>
+            </div>
+            
+            <div class="feature-item">
+                <div class="feature-icon">💳</div>
+                <h3>ادائیگی کے طریقے</h3>
+                <p>نقد، کارڈ، آن لائن، یا ادھار ادائیگی کے اختیارات۔ تمام ادائیگی کے طریقوں کو ٹریک کریں۔</p>
+            </div>
+            
+            <div class="feature-item">
+                <div class="feature-icon">📈</div>
+                <h3>منافع کا حساب</h3>
+                <p>خودکار منافع کا حساب، لاگت کی قیمت اور فروخت کی قیمت کا ٹریکنگ۔ ہر بل پر منافع دیکھیں۔</p>
+            </div>
+            
+            <div class="feature-item">
+                <div class="feature-icon">🔔</div>
+                <h3>الرٹس</h3>
+                <p>کم اسٹاک الرٹس، بہترین فروخت ہونے والی مصنوعات کی اطلاعات، اور کاروباری بصیرت۔</p>
+            </div>
+            
+            <div class="feature-item">
+                <div class="feature-icon">☁️</div>
+                <h3>کلاؤڈ اسٹوریج</h3>
+                <p>آپ کا تمام ڈیٹا محفوظ کلاؤڈ میں محفوظ ہے۔ کسی بھی وقت، کہیں بھی رسائی حاصل کریں۔</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="cta-section">
+    <div class="container">
+        <h2>شروع کرنے کے لیے تیار؟</h2>
+        <p>صرف 2 منٹ میں سیٹ اپ مکمل کریں</p>
+        <a href="{% url 'users:signup' %}" class="btn btn-primary btn-large">مفت اکاؤنٹ بنائیں</a>
+    </div>
+</section>
+{% endblock %}

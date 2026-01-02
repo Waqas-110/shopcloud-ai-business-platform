@@ -1,0 +1,244 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Bill #{{ bill.bill_number }} - ShopCloud{% endblock %}
+
+{% block extra_css %}
+<style>
+body {
+    font-family: 'Noto Nastaliq Urdu', Arial, sans-serif;
+    direction: rtl;
+}
+
+.bill-container {
+    max-width: 800px;
+    margin: 20px auto;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    overflow: hidden;
+}
+
+.bill-header {
+    background: #2563eb;
+    color: white;
+    padding: 20px;
+    text-align: center;
+}
+
+.bill-content {
+    padding: 30px;
+}
+
+.shop-info {
+    text-align: center;
+    margin-bottom: 30px;
+    border-bottom: 2px solid #e0e0e0;
+    padding-bottom: 20px;
+}
+
+.bill-info {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 30px;
+}
+
+.bill-info div {
+    flex: 1;
+}
+
+.items-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 30px;
+}
+
+.items-table th,
+.items-table td {
+    padding: 12px;
+    text-align: right;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+.items-table th {
+    background: #f8f9fa;
+    font-weight: 600;
+}
+
+.totals-section {
+    border-top: 2px solid #e0e0e0;
+    padding-top: 20px;
+}
+
+.total-row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 8px;
+}
+
+.total-row.final {
+    font-size: 18px;
+    font-weight: bold;
+    border-top: 1px solid #e0e0e0;
+    padding-top: 8px;
+}
+
+.bill-footer {
+    text-align: center;
+    margin-top: 30px;
+    padding-top: 20px;
+    border-top: 1px solid #e0e0e0;
+    color: #666;
+}
+
+.action-buttons {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    margin-top: 20px;
+}
+
+.btn {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-block;
+    text-align: center;
+}
+
+.btn-primary {
+    background: #2563eb;
+    color: white;
+}
+
+.btn-success {
+    background: #28a745;
+    color: white;
+}
+
+.btn-secondary {
+    background: #6c757d;
+    color: white;
+}
+
+@media print {
+    .action-buttons {
+        display: none;
+    }
+    
+    .bill-container {
+        box-shadow: none;
+        margin: 0;
+    }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="bill-container">
+    <div class="bill-header">
+        <h1>BILL / رسید</h1>
+        <h2>Bill #{{ bill.bill_number }}</h2>
+    </div>
+    
+    <div class="bill-content">
+        <!-- Shop Information -->
+        <div class="shop-info">
+            <h2>{{ bill.shop.name }}</h2>
+            <p>{{ bill.shop.address }}</p>
+            {% if bill.shop.whatsapp_number %}
+                <p>WhatsApp: {{ bill.shop.whatsapp_number }}</p>
+            {% endif %}
+            {% if bill.shop.email %}
+                <p>Email: {{ bill.shop.email }}</p>
+            {% endif %}
+        </div>
+        
+        <!-- Bill Information -->
+        <div class="bill-info">
+            <div>
+                <strong>تاریخ:</strong> {{ bill.date|date:"d M Y, H:i" }}<br>
+                <strong>بل نمبر:</strong> {{ bill.bill_number }}<br>
+                <strong>ادائیگی:</strong> {{ bill.get_payment_type_display }}
+            </div>
+            <div>
+                {% if bill.customer_name %}
+                    <strong>کسٹمر:</strong> {{ bill.customer_name }}<br>
+                {% endif %}
+                {% if bill.customer_phone %}
+                    <strong>فون:</strong> {{ bill.customer_phone }}<br>
+                {% endif %}
+            </div>
+        </div>
+        
+        <!-- Items Table -->
+        <table class="items-table">
+            <thead>
+                <tr>
+                    <th>آئٹم</th>
+                    <th>مقدار</th>
+                    <th>قیمت</th>
+                    <th>کل</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in bill.items.all %}
+                <tr>
+                    <td>{{ item.product.name }}</td>
+                    <td>{{ item.quantity }}</td>
+                    <td>Rs. {{ item.unit_price }}</td>
+                    <td>Rs. {{ item.total_price }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        
+        <!-- Totals -->
+        <div class="totals-section">
+            <div class="total-row">
+                <span>ذیلی کل:</span>
+                <span>Rs. {{ bill.subtotal }}</span>
+            </div>
+            {% if bill.tax > 0 %}
+            <div class="total-row">
+                <span>ٹیکس:</span>
+                <span>Rs. {{ bill.tax }}</span>
+            </div>
+            {% endif %}
+            {% if bill.discount > 0 %}
+            <div class="total-row">
+                <span>رعایت:</span>
+                <span>Rs. {{ bill.discount }}</span>
+            </div>
+            {% endif %}
+            <div class="total-row final">
+                <span>کل:</span>
+                <span>Rs. {{ bill.total }}</span>
+            </div>
+        </div>
+        
+        <div class="bill-footer">
+            <p>آپ کا شکریہ! / Thank you for your business!</p>
+            <small>Powered by ShopCloud - Made with ❤️ by Waqas Anwar</small>
+        </div>
+    </div>
+    
+    <div class="action-buttons">
+        <button class="btn btn-primary" onclick="window.print()">🖨️ Print</button>
+        <a href="{% url 'billing:bill_pdf' bill.id %}" class="btn btn-success">📄 Download PDF</a>
+        <button class="btn btn-info" onclick="shareWhatsApp()">📱 Share WhatsApp</button>
+        <a href="{% url 'billing:pos' %}" class="btn btn-secondary">← Back to POS</a>
+    </div>
+</div>
+
+<script>
+function shareWhatsApp() {
+    const billUrl = window.location.href;
+    const message = `بل #{{ bill.bill_number }}\nکل: Rs. {{ bill.total }}\nدیکھیں: ${billUrl}`;
+    const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(message)}`;
+    window.open(whatsappUrl, '_blank');
+}
+</script>
+{% endblock %}

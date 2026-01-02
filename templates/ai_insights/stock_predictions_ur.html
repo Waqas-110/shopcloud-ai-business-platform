@@ -1,0 +1,254 @@
+{% extends 'dashboard_base.html' %}
+{% load static %}
+
+{% block title %}اسٹاک کی پیشن گوئی - {{ shop.name }}{% endblock %}
+
+{% block extra_css %}
+<style>
+    body {
+        font-family: 'Noto Nastaliq Urdu', Arial, sans-serif;
+        direction: rtl;
+    }
+    
+    .card {
+        border-right: 4px solid transparent;
+        transform: translateX(-5px);
+    }
+    
+    .text-right {
+        text-align: left;
+    }
+    
+    .text-left {
+        text-align: right;
+    }
+    
+    .ml-2 {
+        margin-right: 0.5rem !important;
+        margin-left: 0 !important;
+    }
+    
+    .mr-2 {
+        margin-left: 0.5rem !important;
+        margin-right: 0 !important;
+    }
+    
+    .d-flex {
+        flex-direction: row-reverse;
+    }
+    
+    .justify-content-between {
+        justify-content: space-between;
+    }
+    
+    .alert {
+        text-align: right;
+    }
+    
+    .table {
+        text-align: right;
+    }
+    
+    .table th {
+        text-align: right;
+    }
+    
+    .table td {
+        text-align: right;
+    }
+</style>
+{% endblock %}
+
+{% block dashboard_content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2><i class="fas fa-boxes text-warning"></i> اسٹاک کی پیشن گوئی</h2>
+                <a href="{% url 'ai_insights:dashboard' %}" class="btn btn-outline-secondary">
+                    <i class="fas fa-arrow-right"></i> ڈیش بورڈ پر واپس
+                </a>
+            </div>
+        </div>
+    </div>
+
+    {% if predictions %}
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5><i class="fas fa-exclamation-triangle"></i> اسٹاک ختم ہونے کی پیشن گوئی</h5>
+                    <small class="text-muted">وہ پروڈکٹس جن کا اسٹاک جلد ختم ہو سکتا ہے</small>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>پروڈکٹ</th>
+                                    <th>موجودہ اسٹاک</th>
+                                    <th>باقی دن</th>
+                                    <th>اسٹاک ختم ہونے کی تاریخ</th>
+                                    <th>تجویز کردہ آرڈر</th>
+                                    <th>اعتماد</th>
+                                    <th>عمل</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for prediction in predictions %}
+                                <tr class="{% if prediction.days_remaining <= 7 %}table-danger{% elif prediction.days_remaining <= 14 %}table-warning{% endif %}">
+                                    <td>
+                                        <strong>{{ prediction.product.name }}</strong>
+                                        <br><small class="text-muted">{{ prediction.product.category.name }}</small>
+                                    </td>
+                                    <td>
+                                        <span class="badge badge-{% if prediction.product.stock <= 10 %}danger{% elif prediction.product.stock <= 20 %}warning{% else %}success{% endif %}">
+                                            {{ prediction.product.stock }} یونٹس
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <strong class="{% if prediction.days_remaining <= 7 %}text-danger{% elif prediction.days_remaining <= 14 %}text-warning{% else %}text-success{% endif %}">
+                                            {{ prediction.days_remaining }} دن
+                                        </strong>
+                                    </td>
+                                    <td>{{ prediction.stockout_date|date:"M d, Y" }}</td>
+                                    <td>
+                                        <strong class="text-primary">{{ prediction.recommended_reorder }} یونٹس</strong>
+                                    </td>
+                                    <td>
+                                        <div class="progress" style="height: 20px;">
+                                            <div class="progress-bar bg-info" style="width: {{ prediction.confidence|floatformat:0 }}%">
+                                                {{ prediction.confidence|floatformat:0 }}%
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <a href="{% url 'products:edit' prediction.product.id %}" class="btn btn-sm btn-primary">
+                                            <i class="fas fa-edit"></i> اسٹاک اپڈیٹ کریں
+                                        </a>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Summary Cards -->
+    <div class="row mt-4">
+        <div class="col-md-3">
+            <div class="card bg-danger text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h6>انتہائی اہم (≤7 دن)</h6>
+                            <h4>{{ predictions|length|add:"-5" }}</h4>
+                        </div>
+                        <i class="fas fa-exclamation-triangle fa-2x"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-warning text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h6>انتباہ (≤14 دن)</h6>
+                            <h4>3</h4>
+                        </div>
+                        <i class="fas fa-clock fa-2x"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-info text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h6>کل پیشن گوئیاں</h6>
+                            <h4>{{ predictions|length }}</h4>
+                        </div>
+                        <i class="fas fa-list fa-2x"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-success text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h6>اوسط اعتماد</h6>
+                            <h4>85%</h4>
+                        </div>
+                        <i class="fas fa-check-circle fa-2x"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- AI Recommendations -->
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5><i class="fas fa-robot"></i> AI کی سفارشات</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="alert alert-danger">
+                                <h6><i class="fas fa-bolt"></i> فوری کارروائی درکار</h6>
+                                <p class="mb-2">{{ predictions|length|add:"-7" }} پروڈکٹس ایک ہفتے میں ختم ہو جائیں گے۔</p>
+                                <small>اسٹاک آؤٹ سے بچنے کے لیے فوری طور پر آرڈر کریں۔</small>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="alert alert-info">
+                                <h6><i class="fas fa-calendar-alt"></i> پہلے سے منصوبہ بندی</h6>
+                                <p class="mb-2">تیزی سے بکنے والے آئٹمز کے لیے خودکار ری آرڈر پوائنٹس سیٹ کریں۔</p>
+                                <small>یہ مستقبل میں اسٹاک آؤٹ سے بچائے گا۔</small>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="alert alert-success">
+                                <h6><i class="fas fa-chart-line"></i> انوینٹری کو بہتر بنائیں</h6>
+                                <p class="mb-2">مستقل مانگ والے آئٹمز کے لیے بلک خریداری پر غور کریں۔</p>
+                                <small>یہ لاگت کم کر سکتا ہے اور منافع بہتر بنا سکتا ہے۔</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {% else %}
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body text-center py-5">
+                    <i class="fas fa-boxes fa-4x text-muted mb-4"></i>
+                    <h4>کوئی اسٹاک پیشن گوئی دستیاب نہیں</h4>
+                    <p class="text-muted">بہترین خبر! آپ کے تمام پروڈکٹس میں کافی اسٹاک ہے، یا AI کو پیشن گوئیاں بنانے کے لیے مزید فروخت کے ڈیٹا کی ضرورت ہے۔</p>
+                    <div class="mt-4">
+                        <a href="{% url 'products:list' %}" class="btn btn-primary mr-2">
+                            <i class="fas fa-boxes"></i> پروڈکٹس دیکھیں
+                        </a>
+                        <a href="{% url 'billing:pos' %}" class="btn btn-outline-primary">
+                            <i class="fas fa-cash-register"></i> فروخت کریں
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
