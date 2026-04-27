@@ -137,9 +137,9 @@ python manage.py runserver
 
 ## 📞 Contact
 
-**Project Maintainer**: [Your Name]
-- Email: your.email@example.com
-- LinkedIn: [Your LinkedIn Profile]
+**Project Maintainer**: Waqas Anwar  
+- Email: waqasanwarmagsi5@gmailcom
+
 
 ---
 
