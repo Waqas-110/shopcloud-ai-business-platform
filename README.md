@@ -4,6 +4,7 @@
 
 ShopCloud is a cloud-based Point of Sale (POS) and business management web application designed specifically for small retail businesses like grocery stores, pharmacies, marts, and general retail shops. It transforms traditional manual operations into a modern, AI-powered digital system.
 
+## 🚀 Link : https://shopcloud.pythonanywhere.com/
 ## 🎯 Problem Statement
 
 Small retail businesses face critical challenges:
